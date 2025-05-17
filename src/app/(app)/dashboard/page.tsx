@@ -93,7 +93,7 @@ export default function DashboardPage() {
           <CardDescription>Learn best practices for staying compliant with METRC regulations.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col md:flex-row items-center gap-4">
-          <Image src="https://placehold.co/600x400.png" alt="Compliance Guide" width={200} height={120} className="rounded-md object-cover" data-ai-hint="compliance regulations" />
+          <Image src="/images/metrc.png" alt="Compliance Guide" width={200} height={120} className="rounded-md object-cover" data-ai-hint="compliance regulations" />
           <div>
             <p className="text-sm text-muted-foreground mb-4">
               Navigating the complexities of METRC can be challenging. This guide provides step-by-step instructions and tips to ensure your operations meet all regulatory requirements.

@@ -1,4 +1,6 @@
 
+"use client";
+
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -75,7 +77,7 @@ export default function ProfilePage() {
             <CardHeader>
               <CardTitle>Security Settings</CardTitle>
               <CardDescription>Manage your account security preferences.</CardDescription>
-            </CardContent>
+            </CardHeader>
             <CardContent className="space-y-4">
                 <Button variant="outline"><Shield className="mr-2 h-4 w-4"/> Change Password</Button>
                 <p className="text-sm text-muted-foreground">Multi-Factor Authentication (MFA) is currently <span className="font-semibold text-primary">Enabled</span>.</p>
