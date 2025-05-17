@@ -21,7 +21,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { ChevronDownIcon } from "lucide-react";
+// ChevronDownIcon is provided by AccordionTrigger from ui/accordion
 import React from "react";
 
 interface SidebarNavProps {
@@ -81,7 +81,8 @@ export function SidebarNav({ items, className }: SidebarNavProps) {
               <AccordionItem value={item.title} key={index} className="border-b-0">
                 <AccordionTrigger
                   className={cn(
-                    "flex items-center justify-between w-full py-2 px-2 rounded-md text-sm font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors [&amp;[data-state=open]>svg]:rotate-180",
+                    "flex items-center justify-between w-full py-2 px-2 rounded-md text-sm font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors",
+                    // Removed [&amp;[data-state=open]>svg]:rotate-180 as AccordionTrigger handles its own icon rotation
                     item.items.some(sub => sub.href === pathname) && "bg-sidebar-accent text-sidebar-accent-foreground"
                   )}
                 >
@@ -89,7 +90,7 @@ export function SidebarNav({ items, className }: SidebarNavProps) {
                     {item.icon && <item.icon className="h-4 w-4" />}
                     {item.title}
                   </div>
-                  <ChevronDownIcon className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+                  {/* Removed explicit ChevronDownIcon here, as AccordionTrigger provides it */}
                 </AccordionTrigger>
                 <AccordionContent className="pt-1 pb-0 pl-4">
                   <SidebarMenuSub className="mx-0 border-l-0 pl-2">

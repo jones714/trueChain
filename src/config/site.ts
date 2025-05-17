@@ -57,7 +57,7 @@ export const siteConfig: SiteConfig = {
       items: [
         { title: "Overview", href: "/processing", icon: PackagePlus },
         { title: "Batches", href: "/processing/batches", icon: Archive },
-        { title: "Drying &amp; Curing", href: "/processing/drying-curing", icon: Recycle },
+        { title: "Drying & Curing", href: "/processing/drying-curing", icon: Recycle },
         { title: "Packaging", href: "/processing/packaging", icon: PackagePlus },
       ],
     },
@@ -72,7 +72,7 @@ export const siteConfig: SiteConfig = {
       items: [
         { title: "Overview", href: "/lab-testing", icon: FlaskConical },
         { title: "Test Requests", href: "/lab-testing/requests", icon: FileText },
-        { title: "Results &amp; COAs", href: "/lab-testing/results", icon: BadgeCheck },
+        { title: "Results & COAs", href: "/lab-testing/results", icon: BadgeCheck },
       ],
     },
     {
