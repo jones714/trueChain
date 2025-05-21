@@ -10,7 +10,7 @@ export default function MedicalOverviewPage() {
     <PageContainer>
       <PageHeader 
         title="Medical Module Overview" 
-        description="Manage medical cannabis inventory, patient profiles, and consultations." 
+        description="Manage medical cannabis inventory, patient profiles, conditions, approved products, refill history, and consultations." 
       />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Link href="/medical/inventory" passHref>
@@ -20,7 +20,7 @@ export default function MedicalOverviewPage() {
               <ClipboardList className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Track and manage cannabis products designated for medical use.</p>
+              <p className="text-sm text-muted-foreground">Track and manage cannabis products designated for medical use, including med-only tagging.</p>
             </CardContent>
           </Card>
         </Link>
@@ -31,7 +31,7 @@ export default function MedicalOverviewPage() {
               <Users className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Manage patient registry information, consultation notes, and purchase history.</p>
+              <p className="text-sm text-muted-foreground">Manage patient registry, conditions, approved products, notes, and purchase/refill history.</p>
             </CardContent>
           </Card>
         </Link>
