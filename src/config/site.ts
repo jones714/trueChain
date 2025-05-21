@@ -17,7 +17,9 @@ import {
   Droplets,
   PackagePlus,
   Archive,
-  ScanBarcode
+  ScanBarcode,
+  HeartPulse,
+  ClipboardList
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -91,6 +93,15 @@ export const siteConfig: SiteConfig = {
         { title: "Retail POS", href: "/sales/pos", icon: ScanBarcode },
         { title: "Sales Records", href: "/sales/records", icon: BarChart3 },
         { title: "Label Generation", href: "/sales/labels", icon: ScanBarcode },
+      ],
+    },
+    {
+      title: "Medical",
+      icon: HeartPulse,
+      items: [
+        { title: "Overview", href: "/medical", icon: HeartPulse },
+        { title: "Medical Inventory", href: "/medical/inventory", icon: ClipboardList },
+        { title: "Patient Profiles", href: "/medical/patients", icon: Users },
       ],
     },
     {
