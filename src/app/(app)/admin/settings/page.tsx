@@ -3,7 +3,7 @@ import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Save, TestTubeDiagonal, ShoppingBag, DollarSign, ShieldAlert, Workflow, Bell } from "lucide-react";
+import { Save, TestTubeDiagonal, ShoppingBag, DollarSign, ShieldAlert, Workflow, Bell, LinkIcon, ShoppingCartIcon, BookOpen } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 export default function SystemSettingsPage() {
   return (
     <PageContainer>
-      <PageHeader title="System Settings" description="Manage product types, retail pricing, testing protocols, partner labs, workflow templates, automated reminders, and other global configurations.">
+      <PageHeader title="System Settings" description="Manage product types, retail pricing, testing protocols, partner labs, workflow templates, automated reminders, integrations, and other global configurations.">
         <Button>
           <Save className="mr-2 h-4 w-4" /> Save Changes
         </Button>
@@ -25,7 +25,7 @@ export default function SystemSettingsPage() {
           <TabsTrigger value="pricing"><DollarSign className="mr-1 h-4 w-4 hidden sm:inline-block"/>Pricing</TabsTrigger>
           <TabsTrigger value="testing"><TestTubeDiagonal className="mr-1 h-4 w-4 hidden sm:inline-block"/>Testing</TabsTrigger>
           <TabsTrigger value="compliance"><ShieldAlert className="mr-1 h-4 w-4 hidden sm:inline-block"/>Compliance &amp; Automation</TabsTrigger>
-          <TabsTrigger value="integrations" className="hidden md:flex"><Save className="mr-1 h-4 w-4"/>Integrations</TabsTrigger>
+          <TabsTrigger value="integrations"><LinkIcon className="mr-1 h-4 w-4"/>Integrations</TabsTrigger>
         </TabsList>
 
         <TabsContent value="products">
@@ -132,27 +132,67 @@ export default function SystemSettingsPage() {
             <Card>
                 <CardHeader>
                 <CardTitle>API Integrations</CardTitle>
-                <CardDescription>Manage integrations with METRC, BioTrack, and other state-level APIs.</CardDescription>
+                <CardDescription>Manage integrations with METRC, BioTrack, state-level APIs, labs, eCommerce, and accounting software.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="p-4 border rounded-md">
-                        <h4 className="font-semibold">METRC API</h4>
-                        <p className="text-xs text-muted-foreground mb-2">Real-time data sync for Plants, Harvests, Waste, etc.</p>
-                        <div className="flex items-center space-x-2">
-                            <Switch id="metrc-enabled" defaultChecked />
-                            <Label htmlFor="metrc-enabled">Enable METRC Integration</Label>
+                <CardContent className="space-y-6">
+                    <div className="p-4 border rounded-lg shadow-sm">
+                        <h4 className="font-semibold flex items-center"><LinkIcon className="mr-2 h-5 w-5 text-primary"/>State Compliance APIs</h4>
+                        <div className="p-3 border rounded-md mt-2">
+                            <h5 className="font-medium">METRC API</h5>
+                            <p className="text-xs text-muted-foreground mb-2">Real-time data sync for Plants, Harvests, Waste, etc.</p>
+                            <div className="flex items-center space-x-2">
+                                <Switch id="metrc-enabled" defaultChecked />
+                                <Label htmlFor="metrc-enabled">Enable METRC Integration</Label>
+                            </div>
+                            <Button variant="outline" size="sm" className="mt-2">Configure Keys</Button>
                         </div>
-                        <Button variant="outline" size="sm" className="mt-2">Configure Keys</Button>
-                    </div>
-                     <div className="p-4 border rounded-md">
-                        <h4 className="font-semibold">BioTrack API (Future)</h4>
-                        <p className="text-xs text-muted-foreground mb-2">Integration planned for future system extensibility.</p>
-                        <div className="flex items-center space-x-2">
-                            <Switch id="biotrack-enabled" disabled />
-                            <Label htmlFor="biotrack-enabled" className="text-muted-foreground">Enable BioTrack Integration</Label>
+                         <div className="p-3 border rounded-md mt-3">
+                            <h5 className="font-medium">BioTrack API (Future)</h5>
+                            <p className="text-xs text-muted-foreground mb-2">Integration planned for future system extensibility.</p>
+                            <div className="flex items-center space-x-2">
+                                <Switch id="biotrack-enabled" disabled />
+                                <Label htmlFor="biotrack-enabled" className="text-muted-foreground">Enable BioTrack Integration</Label>
+                            </div>
+                             <Button variant="outline" size="sm" className="mt-2" disabled>Configure Keys</Button>
                         </div>
-                         <Button variant="outline" size="sm" className="mt-2" disabled>Configure Keys</Button>
                     </div>
+
+                    <Separator />
+
+                     <div className="p-4 border rounded-lg shadow-sm">
+                        <h4 className="font-semibold flex items-center"><TestTubeDiagonal className="mr-2 h-5 w-5 text-primary"/>Third-Party Lab API Sync</h4>
+                        <p className="text-xs text-muted-foreground mb-2">Automatically pull test results and Certificates of Analysis (COAs) from connected labs.</p>
+                        <div className="flex items-center space-x-2">
+                            <Switch id="lab-api-enabled" />
+                            <Label htmlFor="lab-api-enabled">Enable Lab API Sync</Label>
+                        </div>
+                        <Button variant="outline" size="sm" className="mt-2">Configure Lab APIs</Button>
+                    </div>
+                    
+                    <Separator />
+
+                     <div className="p-4 border rounded-lg shadow-sm">
+                        <h4 className="font-semibold flex items-center"><ShoppingCartIcon className="mr-2 h-5 w-5 text-primary"/>eCommerce Sync (Recreational)</h4>
+                        <p className="text-xs text-muted-foreground mb-2">Connect with Shopify or a native store builder for online ordering (where regulations allow).</p>
+                        <div className="flex items-center space-x-2">
+                            <Switch id="ecommerce-enabled" />
+                            <Label htmlFor="ecommerce-enabled">Enable eCommerce Sync</Label>
+                        </div>
+                        <Button variant="outline" size="sm" className="mt-2">Configure eCommerce</Button>
+                    </div>
+
+                    <Separator />
+
+                    <div className="p-4 border rounded-lg shadow-sm">
+                        <h4 className="font-semibold flex items-center"><BookOpen className="mr-2 h-5 w-5 text-primary"/>Accounting Integration</h4>
+                        <p className="text-xs text-muted-foreground mb-2">Automatically reconcile sales data with QuickBooks or Xero.</p>
+                        <div className="flex items-center space-x-2">
+                            <Switch id="accounting-enabled" />
+                            <Label htmlFor="accounting-enabled">Enable Accounting Sync</Label>
+                        </div>
+                        <Button variant="outline" size="sm" className="mt-2">Configure Accounting</Button>
+                    </div>
+
                 </CardContent>
             </Card>
         </TabsContent>
@@ -160,3 +200,4 @@ export default function SystemSettingsPage() {
     </PageContainer>
   );
 }
+
