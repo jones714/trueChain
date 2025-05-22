@@ -21,7 +21,8 @@ import {
   ScanBarcode,
   HeartPulse,
   ClipboardList,
-  MessageSquare, // Or CalendarPlus / Video for consultations
+  MessageSquare,
+  NotebookText, // Added for Recipe Management
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -63,6 +64,7 @@ export const siteConfig: SiteConfig = {
         { title: "Batches", href: "/processing/batches", icon: Archive },
         { title: "Drying & Curing", href: "/processing/drying-curing", icon: Recycle },
         { title: "Packaging", href: "/processing/packaging", icon: PackagePlus },
+        { title: "Recipe Management", href: "/processing/recipes", icon: NotebookText },
       ],
     },
     {

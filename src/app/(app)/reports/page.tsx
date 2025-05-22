@@ -1,10 +1,11 @@
+
 'use client';
 
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Download, Filter, Brain, AlertTriangle, Map } from "lucide-react";
+import { BarChart3, Download, Filter, Brain, AlertTriangle, Map, TrendingUp } from "lucide-react"; // Added TrendingUp for Yield Efficiency
 import {
   ChartContainer,
   ChartTooltip,
@@ -15,12 +16,12 @@ import {
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
 const chartData = [
-  { month: "January", yield: 186, sales: 80 },
-  { month: "February", yield: 305, sales: 200 },
-  { month: "March", yield: 237, sales: 120 },
-  { month: "April", yield: 73, sales: 190 },
-  { month: "May", yield: 209, sales: 130 },
-  { month: "June", yield: 214, sales: 140 },
+  { month: "January", yield: 186, sales: 80, efficiency: 0.15 },
+  { month: "February", yield: 305, sales: 200, efficiency: 0.18 },
+  { month: "March", yield: 237, sales: 120, efficiency: 0.16 },
+  { month: "April", yield: 73, sales: 190, efficiency: 0.12 },
+  { month: "May", yield: 209, sales: 130, efficiency: 0.17 },
+  { month: "June", yield: 214, sales: 140, efficiency: 0.19 },
 ];
 
 const chartConfig = {
@@ -32,6 +33,10 @@ const chartConfig = {
     label: "Sales ($K)",
     color: "hsl(var(--accent))",
   },
+  efficiency: {
+    label: "Extraction Efficiency (%)",
+    color: "hsl(var(--chart-2))", // Using another chart color
+  }
 };
 
 export default function ReportsPage() {
@@ -114,6 +119,44 @@ export default function ReportsPage() {
             </CardContent>
         </Card>
       </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+            <CardTitle>Yield &amp; Efficiency Reports</CardTitle>
+            <CardDescription>Track extraction efficiency by method, strain, or processor.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">Analyze the efficiency of your extraction processes to optimize output and quality. Compare different methods, input materials (strains), and operator performance.</p>
+            <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                    <h4 className="font-semibold mb-2 text-md">Extraction Yield Efficiency (%)</h4>
+                     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+                        <ResponsiveContainer width="100%" height={250}>
+                            <BarChart data={chartData} layout="vertical">
+                            <CartesianGrid horizontal={false} />
+                            <XAxis type="number" tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} />
+                            <YAxis dataKey="month" type="category" tickLine={false} axisLine={false} />
+                            <ChartTooltip cursor={{fill: 'hsl(var(--muted))'}} content={<ChartTooltipContent />} />
+                            <ChartLegend content={<ChartLegendContent />} />
+                            <Bar dataKey="efficiency" fill="var(--color-efficiency)" radius={4} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </ChartContainer>
+                </div>
+                <div className="p-4 border rounded-lg shadow-sm bg-muted/30">
+                    <TrendingUp className="h-6 w-6 text-primary mb-2" />
+                    <h4 className="font-semibold text-md mb-1">Key Efficiency Metrics</h4>
+                    <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1 mt-2">
+                        <li>Average yield per batch: <strong>17.5%</strong></li>
+                        <li>Best performing strain: <strong>Strain A (22% avg)</strong></li>
+                        <li>Most efficient method: <strong>CO2 Extraction (avg +2% vs Ethanol)</strong></li>
+                        <li>Processor performance variance: <strong>+/- 3%</strong></li>
+                    </ul>
+                    <Button variant="link" size="sm" className="p-0 h-auto text-primary text-xs mt-3">View Detailed Efficiency Breakdown</Button>
+                </div>
+            </div>
+        </CardContent>
+      </Card>
 
       <Card className="mt-6">
         <CardHeader>
