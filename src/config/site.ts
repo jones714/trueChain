@@ -1,3 +1,4 @@
+
 import type { SidebarNavItem } from "@/types/nav";
 import {
   LayoutDashboard,
@@ -19,7 +20,8 @@ import {
   Archive,
   ScanBarcode,
   HeartPulse,
-  ClipboardList
+  ClipboardList,
+  MessageSquare, // Or CalendarPlus / Video for consultations
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -102,6 +104,7 @@ export const siteConfig: SiteConfig = {
         { title: "Overview", href: "/medical", icon: HeartPulse },
         { title: "Medical Inventory", href: "/medical/inventory", icon: ClipboardList },
         { title: "Patient Profiles", href: "/medical/patients", icon: Users },
+        { title: "Consultations", href: "/medical/consultations", icon: MessageSquare },
       ],
     },
     {
