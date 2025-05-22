@@ -5,7 +5,7 @@ import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Download, Filter, Brain, AlertTriangle, Map, TrendingUp } from "lucide-react"; // Added TrendingUp for Yield Efficiency
+import { BarChart3, Download, Filter, Brain, AlertTriangle, Map, TrendingUp, FileCheck2, CalendarSearch } from "lucide-react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -35,14 +35,14 @@ const chartConfig = {
   },
   efficiency: {
     label: "Extraction Efficiency (%)",
-    color: "hsl(var(--chart-2))", // Using another chart color
+    color: "hsl(var(--chart-2))", 
   }
 };
 
 export default function ReportsPage() {
   return (
     <PageContainer>
-      <PageHeader title="Interactive Reports & Analytics" description="Visualize yields, sales, inventory, compliance, and gain deeper business insights.">
+      <PageHeader title="Interactive Reports &amp; Analytics" description="Visualize yields, sales, inventory, compliance, and gain deeper business insights.">
          <div className="flex items-center space-x-2">
             <Button variant="outline">
                 <Filter className="mr-2 h-4 w-4" /> Filters
@@ -196,6 +196,38 @@ export default function ReportsPage() {
             </div>
         </CardContent>
       </Card>
+      
+      <Card className="mt-6">
+        <CardHeader>
+            <CardTitle>Audit &amp; Compliance Reports</CardTitle>
+            <CardDescription>Generate and view detailed audit and compliance summaries.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6 md:grid-cols-2">
+            <div className="p-4 border rounded-lg shadow-sm">
+                <FileCheck2 className="h-6 w-6 text-primary mb-2" />
+                <h4 className="font-semibold text-md mb-1">Audit Digest Reports</h4>
+                <p className="text-xs text-muted-foreground">
+                    Weekly or monthly digest of compliance events, flagged batches, unreported sales, and other critical audit points.
+                </p>
+                 <div className="mt-3 p-4 bg-muted/50 rounded-md text-center text-xs text-muted-foreground">
+                    Digest report summary placeholder.
+                </div>
+                <Button variant="link" size="sm" className="p-0 h-auto text-primary text-xs mt-2">Generate Digest</Button>
+            </div>
+             <div className="p-4 border rounded-lg shadow-sm">
+                <CalendarSearch className="h-6 w-6 text-primary mb-2" />
+                <h4 className="font-semibold text-md mb-1">Geo-Tagged Activity Viewer</h4>
+                <p className="text-xs text-muted-foreground">
+                    Visualize where specific actions occurred (e.g., harvesting, transfers) with map-based activity logs.
+                </p>
+                <div className="mt-3 p-4 bg-muted/50 rounded-md text-center text-xs text-muted-foreground">
+                    Map or list view for geo-tagged logs.
+                </div>
+                 <Button variant="link" size="sm" className="p-0 h-auto text-primary text-xs mt-2">View Activity Map</Button>
+            </div>
+        </CardContent>
+      </Card>
+
     </PageContainer>
   );
 }

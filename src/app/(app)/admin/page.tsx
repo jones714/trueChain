@@ -1,8 +1,9 @@
+
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Building, BadgeCheck, Settings, Activity, ShieldCheck } from "lucide-react";
+import { Users, Building, BadgeCheck, Settings, Activity, ShieldCheck, Workflow, MapPin } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboardPage() {
@@ -50,7 +51,7 @@ export default function AdminDashboardPage() {
               <Settings className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Configure product types, pricing, testing protocols.</p>
+              <p className="text-sm text-muted-foreground">Configure product types, pricing, testing, workflows & automations.</p>
             </CardContent>
           </Card>
         </Link>
@@ -60,7 +61,7 @@ export default function AdminDashboardPage() {
               <Activity className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">View system-wide audit trails and METRC API activity.</p>
+              <p className="text-sm text-muted-foreground">View system-wide audit trails, METRC API activity, geo-tagged logs, and role-based action logs.</p>
                <Button variant="link" className="p-0 h-auto text-primary text-xs mt-2">View Logs</Button>
             </CardContent>
         </Card>

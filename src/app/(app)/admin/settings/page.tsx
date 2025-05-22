@@ -1,17 +1,19 @@
+
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Save, TestTubeDiagonal, ShoppingBag, DollarSign, ShieldAlert } from "lucide-react";
+import { Save, TestTubeDiagonal, ShoppingBag, DollarSign, ShieldAlert, Workflow, Bell } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 
 export default function SystemSettingsPage() {
   return (
     <PageContainer>
-      <PageHeader title="System Settings" description="Manage product types, retail pricing, testing protocols, partner labs, and other global configurations.">
+      <PageHeader title="System Settings" description="Manage product types, retail pricing, testing protocols, partner labs, workflow templates, automated reminders, and other global configurations.">
         <Button>
           <Save className="mr-2 h-4 w-4" /> Save Changes
         </Button>
@@ -22,7 +24,7 @@ export default function SystemSettingsPage() {
           <TabsTrigger value="products"><ShoppingBag className="mr-1 h-4 w-4 hidden sm:inline-block"/>Products</TabsTrigger>
           <TabsTrigger value="pricing"><DollarSign className="mr-1 h-4 w-4 hidden sm:inline-block"/>Pricing</TabsTrigger>
           <TabsTrigger value="testing"><TestTubeDiagonal className="mr-1 h-4 w-4 hidden sm:inline-block"/>Testing</TabsTrigger>
-          <TabsTrigger value="compliance"><ShieldAlert className="mr-1 h-4 w-4 hidden sm:inline-block"/>Compliance</TabsTrigger>
+          <TabsTrigger value="compliance"><ShieldAlert className="mr-1 h-4 w-4 hidden sm:inline-block"/>Compliance &amp; Automation</TabsTrigger>
           <TabsTrigger value="integrations" className="hidden md:flex"><Save className="mr-1 h-4 w-4"/>Integrations</TabsTrigger>
         </TabsList>
 
@@ -91,23 +93,38 @@ export default function SystemSettingsPage() {
          <TabsContent value="compliance">
             <Card>
                 <CardHeader>
-                <CardTitle>Compliance Settings</CardTitle>
-                <CardDescription>Configure purchase limits, METRC sync settings, and other compliance parameters.</CardDescription>
+                <CardTitle>Compliance &amp; Automation Settings</CardTitle>
+                <CardDescription>Configure purchase limits, METRC sync, automated reminders, and workflow templates.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                <div>
-                    <Label htmlFor="purchase-limit-flower">Daily Purchase Limit (Flower, grams)</Label>
-                    <Input id="purchase-limit-flower" type="number" placeholder="28" />
-                </div>
-                 <div>
-                    <Label htmlFor="purchase-limit-concentrate">Daily Purchase Limit (Concentrate, grams)</Label>
-                    <Input id="purchase-limit-concentrate" type="number" placeholder="8" />
-                </div>
-                <div className="flex items-center space-x-2">
-                    <Switch id="auto-metrc-sync" defaultChecked />
-                    <Label htmlFor="auto-metrc-sync">Enable Automatic METRC Sync</Label>
-                </div>
-                <p className="text-muted-foreground">More compliance settings and jurisdictional configurations will appear here.</p>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div>
+                        <Label htmlFor="purchase-limit-flower">Daily Purchase Limit (Flower, grams)</Label>
+                        <Input id="purchase-limit-flower" type="number" placeholder="28" />
+                    </div>
+                    <div>
+                        <Label htmlFor="purchase-limit-concentrate">Daily Purchase Limit (Concentrate, grams)</Label>
+                        <Input id="purchase-limit-concentrate" type="number" placeholder="8" />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Switch id="auto-metrc-sync" defaultChecked />
+                        <Label htmlFor="auto-metrc-sync">Enable Automatic METRC Sync</Label>
+                    </div>
+                     <p className="text-xs text-muted-foreground">More jurisdictional compliance settings will appear here.</p>
+                  </div>
+                  <Separator />
+                  <div className="space-y-4">
+                    <h4 className="text-md font-medium flex items-center"><Workflow className="mr-2 h-5 w-5 text-primary"/>Workflow Automation</h4>
+                     <div className="flex items-center justify-between space-x-2 p-3 border rounded-md">
+                        <Label htmlFor="workflow-templates" className="font-normal">Manage Workflow Templates (SOPs)</Label>
+                        <Button variant="outline" size="sm">Configure Templates</Button>
+                    </div>
+                     <div className="flex items-center justify-between space-x-2 p-3 border rounded-md">
+                        <Label htmlFor="automated-reminders" className="font-normal">Setup Automated Reminders &amp; Tasks</Label>
+                        <Button variant="outline" size="sm"><Bell className="mr-1 h-4 w-4"/>Configure Reminders</Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Define pre-built SOPs (e.g., for new cultivators) and set up automated tasks like watering reminders or drying cycle notifications.</p>
+                  </div>
                 </CardContent>
             </Card>
         </TabsContent>
