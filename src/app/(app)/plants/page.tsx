@@ -15,6 +15,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   PlusCircle,
   Filter,
   Sprout,
@@ -40,6 +48,7 @@ import {
   ListFilter,
   FileEdit,
   CameraIcon,
+  MoreHorizontal, // Added for dropdown trigger
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -227,10 +236,42 @@ export default function PlantsPage() {
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" title="Move Plants"><Move className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" title="Change Stage"><Sprout className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" title="Harvest"><Scissors className="h-4 w-4" /></Button>
-                    {/* More actions (Clone, Destroy, Print Tags, View Details) can be in a DropdownMenu */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem>
+                          <Move className="mr-2 h-4 w-4" />
+                          <span>Move Plants</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Sprout className="mr-2 h-4 w-4" />
+                          <span>Change Stage</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <GitFork className="mr-2 h-4 w-4" />
+                          <span>Clone Plants</span>
+                        </DropdownMenuItem>
+                         <DropdownMenuItem>
+                          <Scissors className="mr-2 h-4 w-4" />
+                          <span>Harvest</span>
+                        </DropdownMenuItem>
+                         <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                          <Printer className="mr-2 h-4 w-4" />
+                          <span>Print Tags</span>
+                        </DropdownMenuItem>
+                         <DropdownMenuItem className="text-destructive hover:!text-destructive focus:!text-destructive focus:!bg-destructive/10">
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          <span>Destroy Batch</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -334,4 +375,3 @@ export default function PlantsPage() {
     </PageContainer>
   );
 }
-
