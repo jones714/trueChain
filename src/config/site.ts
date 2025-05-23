@@ -28,9 +28,10 @@ import {
   Recycle,
   Car,
   DownloadCloud,
-  RotateCcw, // Added for Returns & Refunds
-  Percent,   // Added for Discounts & Promotions
-  History,   // Added for Customer History
+  RotateCcw,
+  Percent,
+  History,
+  PackageCheck, // Added for Customer Deliveries
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -89,9 +90,10 @@ export const siteConfig: SiteConfig = {
       items: [
         { title: "Overview", href: "/transfers", icon: Truck },
         { title: "Manifests", href: "/transfers/manifests", icon: FileText },
+        { title: "Incoming Transfers", href: "/transfers/incoming", icon: DownloadCloud },
+        { title: "Customer Deliveries", href: "/transfers/deliveries", icon: PackageCheck },
         { title: "Chain of Custody", href: "/transfers/custody", icon: Users }, 
         { title: "Drivers & Vehicles", href: "/transfers/drivers-vehicles", icon: Car },
-        { title: "Incoming Transfers", href: "/transfers/incoming", icon: DownloadCloud },
       ],
     },
     {
@@ -100,10 +102,10 @@ export const siteConfig: SiteConfig = {
       items: [
         { title: "Retail POS", href: "/sales/pos", icon: ScanBarcode },
         { title: "Sales Records", href: "/sales/records", icon: BarChart3 },
-        { title: "Label Generation", href: "/sales/labels", icon: ScanBarcode },
+        { title: "Customer History", href: "/sales/history", icon: History },
         { title: "Returns & Refunds", href: "/sales/returns", icon: RotateCcw },
         { title: "Discounts & Promotions", href: "/sales/discounts", icon: Percent },
-        { title: "Customer History", href: "/sales/history", icon: History },
+        { title: "Label Generation", href: "/sales/labels", icon: ScanBarcode },
       ],
     },
      {
@@ -111,9 +113,9 @@ export const siteConfig: SiteConfig = {
       icon: HeartPulse,
       items: [
         { title: "Overview", href: "/medical", icon: HeartPulse },
-        { title: "Medical Inventory", href: "/medical/inventory", icon: ClipboardList },
         { title: "Patient Profiles", href: "/medical/patients", icon: Users },
         { title: "Consultations", href: "/medical/consultations", icon: MessageSquare },
+        { title: "Medical Inventory", href: "/medical/inventory", icon: ClipboardList },
       ],
     },
     {
