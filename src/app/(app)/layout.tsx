@@ -13,7 +13,7 @@ import {
   SidebarInset,
   SidebarProvider,
   useSidebar,
-  SidebarTrigger // Added SidebarTrigger import
+  SidebarTrigger
 } from "@/components/ui/sidebar";
 import { siteConfig } from "@/config/site";
 import { Separator } from "@/components/ui/separator";
@@ -102,25 +102,27 @@ function SidebarInnerContent() {
 
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const [defaultOpen, setDefaultOpen] = React.useState(true); // Default to true (expanded) for SSR
+  // Renamed defaultOpen state variable to persistedSidebarOpen for clarity
+  const [persistedSidebarOpen, setPersistedSidebarOpen] = React.useState(true); 
   const [sidebarSettingsLoaded, setSidebarSettingsLoaded] = React.useState(false);
 
 
   React.useEffect(() => {
     const storedState = localStorage.getItem("sidebar_state_trucanalytix");
     if (storedState !== null) {
-      setDefaultOpen(JSON.parse(storedState));
+      setPersistedSidebarOpen(JSON.parse(storedState));
     }
     setSidebarSettingsLoaded(true);
   }, []);
 
   const handleOpenChange = (open: boolean) => {
-    setDefaultOpen(open);
+    setPersistedSidebarOpen(open);
     localStorage.setItem("sidebar_state_trucanalytix", JSON.stringify(open));
   };
   
   return (
-    <SidebarProvider defaultOpen={defaultOpen} onOpenChange={handleOpenChange}>
+    // Pass persistedSidebarOpen as `open` prop to make SidebarProvider controlled
+    <SidebarProvider open={persistedSidebarOpen} onOpenChange={handleOpenChange}>
       <Sidebar collapsible="icon" variant="sidebar" className="border-r">
         {sidebarSettingsLoaded ? <SidebarInnerContent /> : <SidebarPlaceholderContent />}
       </Sidebar>
