@@ -59,7 +59,8 @@ import {
   UploadCloud, // Upload lab results
   BookOpen, // View logs
   Wrench, // Log custom activity
-  ClipboardList // Log harvest & yield
+  ClipboardList, // Log harvest & yield
+  Clock // Added Clock icon
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -218,7 +219,7 @@ export default function PlantsLifecycleDashboardPage() {
   const [strainFilter, setStrainFilter] = useState('all_strains');
   const [locationFilter, setLocationFilter] = useState('all_locations');
   const [qaStatusFilter, setQaStatusFilter] = useState('all_qa');
-  const [activeFilter, setActiveFilter] = useState('all_activity'); // 'active', 'harvested', 'all'
+  const [activeFilter, setActiveFilter] = useState('all_activity'); // 'active', 'harvested', 'all_activity'
 
   const uniqueStrains = useMemo(() => Array.from(new Set(initialPlantBatches.map(b => b.strain))), []);
   const uniqueLocations = useMemo(() => Array.from(new Set(initialPlantBatches.map(b => b.roomLocation))), []);
@@ -237,9 +238,10 @@ export default function PlantsLifecycleDashboardPage() {
       const matchesLocation = (locationFilter === 'all_locations') ? true : batch.roomLocation === locationFilter;
       const matchesQA = (qaStatusFilter === 'all_qa') ? true : batch.qaStatus === qaStatusFilter;
       
-      const matchesActivity = (activeFilter === 'all_activity') ? true :
-                              (activeFilter === 'active' && batch.status !== 'Harvested' && batch.status !== 'Destroyed') ? true :
-                              (activeFilter === 'harvested' && batch.status === 'Harvested') ? true : false;
+      const matchesActivity = 
+        (activeFilter === 'all_activity') ? true :
+        (activeFilter === 'active' && batch.status !== 'Harvested' && batch.status !== 'Destroyed') ? true :
+        (activeFilter === 'harvested' && batch.status === 'Harvested') ? true : false;
       
       return matchesSearch && matchesStage && matchesStrain && matchesLocation && matchesQA && matchesActivity;
     });
@@ -371,7 +373,12 @@ export default function PlantsLifecycleDashboardPage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={batch.qaStatus === 'Pass' ? 'default' : batch.qaStatus === 'Fail' ? 'destructive' : 'secondary'} 
-                           className={cn(batch.qaStatus === 'Pass' && "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300")}>
+                           className={cn(
+                            batch.qaStatus === 'Pass' && "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+                            batch.qaStatus === 'Untested' && "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300", // Example for untested
+                            batch.qaStatus === 'Fail' && "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" // Ensure fail is destructive like
+                           )}
+                    >
                         <QAIcon className="h-3.5 w-3.5 mr-1"/>{batch.qaStatus}
                     </Badge>
                   </TableCell>
