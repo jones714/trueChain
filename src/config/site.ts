@@ -3,8 +3,7 @@ import type { SidebarNavItem } from "@/types/nav";
 import {
   LayoutDashboard,
   Sprout,
-  Recycle,
-  Warehouse,
+  Warehouse, // Changed from Recycle for Processing Overview, might need PackagePlus if specifically for packaging
   FlaskConical,
   Truck,
   ShoppingCart,
@@ -15,17 +14,22 @@ import {
   Settings,
   Cog,
   FileText,
-  PackagePlus,
-  Archive,
+  PackagePlus, // Good for general processing/packaging
+  Archive, // Good for Batches
   ScanBarcode,
   HeartPulse,
   ClipboardList,
   MessageSquare,
   NotebookText,
   Trash2,
-  Droplets, // Keep for potential use in new Plant Overview
-  Flower2, // Keep for potential use
-  Scissors // Keep for potential use
+  Droplets, 
+  Flower2, 
+  Scissors,
+  Recycle, // Keep for Drying/Curing if it fits, or use Thermometer/Hourglass
+  Car, // For Drivers & Vehicles
+  DownloadCloud, // For Incoming Transfers
+  AlertTriangle,
+  ShieldCheck as MetrcSyncedIcon, // Alias for clarity
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -40,8 +44,8 @@ export type SiteConfig = {
 export const siteConfig: SiteConfig = {
   name: "TruCanalytix",
   description: "Comprehensive Cannabis Compliance and Management Platform.",
-  url: "https://example.com", // Replace with your actual URL
-  ogImage: "https://example.com/og.jpg", // Replace with your actual OG image URL
+  url: "https://example.com", 
+  ogImage: "https://example.com/og.jpg", 
   mainNav: [
     {
       title: "Dashboard",
@@ -51,28 +55,21 @@ export const siteConfig: SiteConfig = {
     {
       title: "Inventory",
       href: "/inventory",
-      icon: Warehouse,
+      icon: Warehouse, // Changed to Warehouse for general inventory
     },
     {
       title: "Plants",
-      href: "/plants", // Direct link to the unified dashboard
+      href: "/plants", 
       icon: Sprout,
-      // items: [ // Removed sub-items
-      //   { title: "Overview", href: "/plants", icon: Sprout },
-      //   { title: "Germination", href: "/plants/germination", icon: Droplets },
-      //   { title: "Vegetative", href: "/plants/vegetative", icon: Sprout },
-      //   { title: "Flowering", href: "/plants/flowering", icon: Flower2 }, // Using Flower2 if available
-      //   { title: "Harvests", href: "/plants/harvests", icon: Scissors }, // Using Scissors
-      // ],
     },
     {
       title: "Processing",
-      icon: PackagePlus,
+      icon: PackagePlus, // Using PackagePlus for the main processing icon
       items: [
-        { title: "Overview", href: "/processing", icon: PackagePlus },
+        { title: "Overview", href: "/processing", icon: PackagePlus }, // Or Warehouse if more general
         { title: "Batches", href: "/processing/batches", icon: Archive },
-        { title: "Drying & Curing", href: "/processing/drying-curing", icon: Recycle },
-        { title: "Packaging", href: "/processing/packaging", icon: PackagePlus },
+        { title: "Drying & Curing", href: "/processing/drying-curing", icon: Recycle }, // Or Thermometer/Hourglass
+        { title: "Packaging", href: "/processing/packaging", icon: PackagePlus }, // Keep PackagePlus
         { title: "Recipe Management", href: "/processing/recipes", icon: NotebookText },
       ],
     },
@@ -91,7 +88,9 @@ export const siteConfig: SiteConfig = {
       items: [
         { title: "Overview", href: "/transfers", icon: Truck },
         { title: "Manifests", href: "/transfers/manifests", icon: FileText },
-        { title: "Chain of Custody", href: "/transfers/custody", icon: Users },
+        { title: "Chain of Custody", href: "/transfers/custody", icon: Users }, // Users icon for CoC is okay, implies people involved
+        { title: "Drivers & Vehicles", href: "/transfers/drivers-vehicles", icon: Car },
+        { title: "Incoming Transfers", href: "/transfers/incoming", icon: DownloadCloud },
       ],
     },
     {
