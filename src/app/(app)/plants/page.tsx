@@ -39,7 +39,7 @@ import {
   MapPin,
   ListFilter,
   FileEdit,
-  CameraIcon, // Corrected to CameraIcon if Camera is not available
+  CameraIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -110,8 +110,8 @@ const initialPlantBatches = [
 
 export default function PlantsPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [stageFilter, setStageFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [stageFilter, setStageFilter] = useState('all_stages');
+  const [statusFilter, setStatusFilter] = useState('all_statuses');
 
   const filteredPlantBatches = initialPlantBatches.filter(batch => {
     const matchesSearchTerm = 
@@ -119,8 +119,10 @@ export default function PlantsPage() {
       batch.tagId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       batch.strain.toLowerCase().includes(searchTerm.toLowerCase()) ||
       batch.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStage = stageFilter ? batch.stage === stageFilter : true;
-    const matchesStatus = statusFilter ? batch.status === statusFilter : true;
+    
+    const matchesStage = (stageFilter === 'all_stages') ? true : batch.stage === stageFilter;
+    const matchesStatus = (statusFilter === 'all_statuses') ? true : batch.status === statusFilter;
+    
     return matchesSearchTerm && matchesStage && matchesStatus;
   });
 
@@ -154,7 +156,7 @@ export default function PlantsPage() {
               <SelectValue placeholder="Filter by Stage" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Stages</SelectItem>
+              <SelectItem value="all_stages">All Stages</SelectItem>
               <SelectItem value="Germination">Germination</SelectItem>
               <SelectItem value="Vegetative">Vegetative</SelectItem>
               <SelectItem value="Flowering">Flowering</SelectItem>
@@ -167,7 +169,7 @@ export default function PlantsPage() {
               <SelectValue placeholder="Filter by Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="all_statuses">All Statuses</SelectItem>
               <SelectItem value="Active">Active</SelectItem>
               <SelectItem value="On Hold">On Hold</SelectItem>
               <SelectItem value="Transferred">Transferred</SelectItem>
@@ -333,4 +335,3 @@ export default function PlantsPage() {
   );
 }
 
-    
