@@ -15,7 +15,6 @@ import {
   Settings,
   Cog,
   FileText,
-  Droplets,
   PackagePlus,
   Archive,
   ScanBarcode,
@@ -23,7 +22,10 @@ import {
   ClipboardList,
   MessageSquare,
   NotebookText,
-  Trash2, // Added for Waste Management
+  Trash2,
+  Droplets, // Keep for potential use in new Plant Overview
+  Flower2, // Keep for potential use
+  Scissors // Keep for potential use
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -53,14 +55,15 @@ export const siteConfig: SiteConfig = {
     },
     {
       title: "Plants",
+      href: "/plants", // Direct link to the unified dashboard
       icon: Sprout,
-      items: [
-        { title: "Overview", href: "/plants", icon: Sprout },
-        { title: "Germination", href: "/plants/germination", icon: Droplets },
-        { title: "Vegetative", href: "/plants/vegetative", icon: Sprout },
-        { title: "Flowering", href: "/plants/flowering", icon: Sprout },
-        { title: "Harvests", href: "/plants/harvests", icon: Recycle },
-      ],
+      // items: [ // Removed sub-items
+      //   { title: "Overview", href: "/plants", icon: Sprout },
+      //   { title: "Germination", href: "/plants/germination", icon: Droplets },
+      //   { title: "Vegetative", href: "/plants/vegetative", icon: Sprout },
+      //   { title: "Flowering", href: "/plants/flowering", icon: Flower2 }, // Using Flower2 if available
+      //   { title: "Harvests", href: "/plants/harvests", icon: Scissors }, // Using Scissors
+      // ],
     },
     {
       title: "Processing",
