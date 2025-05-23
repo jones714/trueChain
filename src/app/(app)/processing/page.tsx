@@ -5,7 +5,7 @@ import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, PackageSearch, Hourglass, Thermometer, PercentCircle, BarChart2, Recycle, CookingPot, ArchiveBox } from "lucide-react";
+import { PlusCircle, PackageSearch, Hourglass, Thermometer, PercentCircle, BarChart2, Recycle, CookingPot, Archive } from "lucide-react";
 import Link from "next/link";
 
 export default function ProcessingOverviewPage() {
@@ -41,7 +41,7 @@ export default function ProcessingOverviewPage() {
           </Button>
           <Button variant="outline" asChild>
             <Link href="/processing/packaging?action=start_packaging">
-               <ArchiveBox className="mr-2 h-4 w-4" /> Start Packaging Run
+               <Archive className="mr-2 h-4 w-4" /> Start Packaging Run
             </Link>
           </Button>
         </div>
@@ -102,7 +102,7 @@ export default function ProcessingOverviewPage() {
           <Link href="/processing/batches" passHref>
             <Card className="hover:shadow-md transition-shadow cursor-pointer p-4">
               <div className="flex items-center mb-2">
-                <ArchiveBox className="h-6 w-6 text-primary mr-2"/>
+                <Archive className="h-6 w-6 text-primary mr-2"/>
                 <h3 className="font-semibold">Processing Batches</h3>
               </div>
               <p className="text-xs text-muted-foreground">Manage all processing batches, their stages, inputs, outputs, and related logs.</p>

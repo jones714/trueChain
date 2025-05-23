@@ -22,7 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PlusCircle, ArchiveBox, Filter, MoreHorizontal, Eye, ArrowRightCircle, Recycle, Printer, CookingPot, ChevronDown, Tag } from "lucide-react";
+import { PlusCircle, Archive, Filter, MoreHorizontal, Eye, ArrowRightCircle, Recycle, Printer, CookingPot, ChevronDown, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState, useMemo } from "react";
@@ -150,7 +150,7 @@ export default function ProcessingBatchesPage() {
                         <DropdownMenuItem><CookingPot className="mr-2 h-4 w-4" />Assign to Recipe</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive hover:!text-destructive focus:!text-destructive focus:!bg-destructive/10">
-                          <ArchiveBox className="mr-2 h-4 w-4" />Archive Batch
+                          <Archive className="mr-2 h-4 w-4" />Archive Batch
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

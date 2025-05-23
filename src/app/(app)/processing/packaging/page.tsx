@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PackagePlus, ScanBarcode, Printer, Tag, Users, Scale, Trash2, PlusCircle, ArchiveBox, ClipboardList } from "lucide-react";
+import { PackagePlus, ScanBarcode, Printer, Tag, Users, Scale, Trash2, PlusCircle, Archive, ClipboardList } from "lucide-react";
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 
@@ -153,7 +153,7 @@ export default function PackagingPage() {
                 <Input id="assigned-staff-pkg" placeholder="Staff names" />
               </div>
               
-              <Button className="w-full"><ArchiveBox className="mr-2 h-4 w-4"/>Initiate Packaging Run</Button>
+              <Button className="w-full"><Archive className="mr-2 h-4 w-4"/>Initiate Packaging Run</Button>
               
               <Separator className="my-6"/>
 
