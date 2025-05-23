@@ -3,7 +3,7 @@ import type { SidebarNavItem } from "@/types/nav";
 import {
   LayoutDashboard,
   Sprout,
-  Warehouse, // Changed from Recycle for Processing Overview, might need PackagePlus if specifically for packaging
+  Warehouse,
   FlaskConical,
   Truck,
   ShoppingCart,
@@ -14,8 +14,8 @@ import {
   Settings,
   Cog,
   FileText,
-  PackagePlus, // Good for general processing/packaging
-  Archive, // Good for Batches
+  PackagePlus,
+  Archive,
   ScanBarcode,
   HeartPulse,
   ClipboardList,
@@ -25,11 +25,12 @@ import {
   Droplets, 
   Flower2, 
   Scissors,
-  Recycle, // Keep for Drying/Curing if it fits, or use Thermometer/Hourglass
-  Car, // For Drivers & Vehicles
-  DownloadCloud, // For Incoming Transfers
-  AlertTriangle,
-  ShieldCheck as MetrcSyncedIcon, // Alias for clarity
+  Recycle,
+  Car,
+  DownloadCloud,
+  RotateCcw, // Added for Returns & Refunds
+  Percent,   // Added for Discounts & Promotions
+  History,   // Added for Customer History
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -55,7 +56,7 @@ export const siteConfig: SiteConfig = {
     {
       title: "Inventory",
       href: "/inventory",
-      icon: Warehouse, // Changed to Warehouse for general inventory
+      icon: Warehouse,
     },
     {
       title: "Plants",
@@ -64,12 +65,12 @@ export const siteConfig: SiteConfig = {
     },
     {
       title: "Processing",
-      icon: PackagePlus, // Using PackagePlus for the main processing icon
+      icon: PackagePlus,
       items: [
-        { title: "Overview", href: "/processing", icon: PackagePlus }, // Or Warehouse if more general
+        { title: "Overview", href: "/processing", icon: PackagePlus },
         { title: "Batches", href: "/processing/batches", icon: Archive },
-        { title: "Drying & Curing", href: "/processing/drying-curing", icon: Recycle }, // Or Thermometer/Hourglass
-        { title: "Packaging", href: "/processing/packaging", icon: PackagePlus }, // Keep PackagePlus
+        { title: "Drying & Curing", href: "/processing/drying-curing", icon: Recycle },
+        { title: "Packaging", href: "/processing/packaging", icon: PackagePlus },
         { title: "Recipe Management", href: "/processing/recipes", icon: NotebookText },
       ],
     },
@@ -88,7 +89,7 @@ export const siteConfig: SiteConfig = {
       items: [
         { title: "Overview", href: "/transfers", icon: Truck },
         { title: "Manifests", href: "/transfers/manifests", icon: FileText },
-        { title: "Chain of Custody", href: "/transfers/custody", icon: Users }, // Users icon for CoC is okay, implies people involved
+        { title: "Chain of Custody", href: "/transfers/custody", icon: Users }, 
         { title: "Drivers & Vehicles", href: "/transfers/drivers-vehicles", icon: Car },
         { title: "Incoming Transfers", href: "/transfers/incoming", icon: DownloadCloud },
       ],
@@ -100,6 +101,9 @@ export const siteConfig: SiteConfig = {
         { title: "Retail POS", href: "/sales/pos", icon: ScanBarcode },
         { title: "Sales Records", href: "/sales/records", icon: BarChart3 },
         { title: "Label Generation", href: "/sales/labels", icon: ScanBarcode },
+        { title: "Returns & Refunds", href: "/sales/returns", icon: RotateCcw },
+        { title: "Discounts & Promotions", href: "/sales/discounts", icon: Percent },
+        { title: "Customer History", href: "/sales/history", icon: History },
       ],
     },
      {
