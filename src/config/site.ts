@@ -22,7 +22,8 @@ import {
   HeartPulse,
   ClipboardList,
   MessageSquare,
-  NotebookText, // Added for Recipe Management
+  NotebookText,
+  Trash2, // Added for Waste Management
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -46,6 +47,11 @@ export const siteConfig: SiteConfig = {
       icon: LayoutDashboard,
     },
     {
+      title: "Inventory",
+      href: "/inventory",
+      icon: Warehouse,
+    },
+    {
       title: "Plants",
       icon: Sprout,
       items: [
@@ -66,11 +72,6 @@ export const siteConfig: SiteConfig = {
         { title: "Packaging", href: "/processing/packaging", icon: PackagePlus },
         { title: "Recipe Management", href: "/processing/recipes", icon: NotebookText },
       ],
-    },
-    {
-      title: "Inventory",
-      href: "/inventory",
-      icon: Warehouse,
     },
     {
       title: "Lab Testing",
@@ -99,7 +100,7 @@ export const siteConfig: SiteConfig = {
         { title: "Label Generation", href: "/sales/labels", icon: ScanBarcode },
       ],
     },
-    {
+     {
       title: "Medical",
       icon: HeartPulse,
       items: [
@@ -108,6 +109,11 @@ export const siteConfig: SiteConfig = {
         { title: "Patient Profiles", href: "/medical/patients", icon: Users },
         { title: "Consultations", href: "/medical/consultations", icon: MessageSquare },
       ],
+    },
+    {
+      title: "Waste Management",
+      href: "/waste",
+      icon: Trash2,
     },
     {
       title: "Reports",
