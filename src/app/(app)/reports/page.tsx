@@ -5,7 +5,7 @@ import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Download, Filter, Brain, AlertTriangle, Map, TrendingUp, FileCheck2, CalendarSearch } from "lucide-react";
+import { BarChart3, Download, Filter, Brain, AlertTriangle, Map, TrendingUp, FileCheck2, CalendarSearch, HeartPulse, Activity } from "lucide-react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -13,30 +13,40 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Pie, PieChart, Cell } from "recharts"; // Added Pie, PieChart, Cell
 
 const chartData = [
-  { month: "January", yield: 186, sales: 80, efficiency: 0.15 },
-  { month: "February", yield: 305, sales: 200, efficiency: 0.18 },
-  { month: "March", yield: 237, sales: 120, efficiency: 0.16 },
-  { month: "April", yield: 73, sales: 190, efficiency: 0.12 },
-  { month: "May", yield: 209, sales: 130, efficiency: 0.17 },
-  { month: "June", yield: 214, sales: 140, efficiency: 0.19 },
+  { month: "January", yield: 186, sales: 80, efficiency: 0.15, medRevenue: 30 },
+  { month: "February", yield: 305, sales: 200, efficiency: 0.18, medRevenue: 75 },
+  { month: "March", yield: 237, sales: 120, efficiency: 0.16, medRevenue: 40 },
+  { month: "April", yield: 73, sales: 190, efficiency: 0.12, medRevenue: 60 },
+  { month: "May", yield: 209, sales: 130, efficiency: 0.17, medRevenue: 50 },
+  { month: "June", yield: 214, sales: 140, efficiency: 0.19, medRevenue: 55 },
 ];
 
+const medicalAnalyticsData = {
+    topConditions: [
+        { name: 'Chronic Pain', value: 400 },
+        { name: 'Anxiety', value: 300 },
+        { name: 'Insomnia', value: 200 },
+        { name: 'Nausea', value: 100 },
+    ],
+    productEfficacy: [ // Conceptual data
+        { name: 'Strain A (Pain)', efficacy: 85 },
+        { name: 'CBD Oil (Anxiety)', efficacy: 70 },
+        { name: 'Indica XYZ (Sleep)', efficacy: 90 },
+    ]
+};
+const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
+
+
 const chartConfig = {
-  yield: {
-    label: "Harvest Yield (kg)",
-    color: "hsl(var(--primary))",
-  },
-  sales: {
-    label: "Sales ($K)",
-    color: "hsl(var(--accent))",
-  },
-  efficiency: {
-    label: "Extraction Efficiency (%)",
-    color: "hsl(var(--chart-2))", 
-  }
+  yield: { label: "Harvest Yield (kg)", color: "hsl(var(--primary))" },
+  sales: { label: "Total Sales ($K)", color: "hsl(var(--accent))" },
+  medRevenue: { label: "Medical Revenue ($K)", color: "hsl(var(--chart-2))" },
+  efficiency: { label: "Extraction Efficiency (%)", color: "hsl(var(--chart-3))" },
+  topConditions: { label: "Patient Count" },
+  productEfficacy: { label: "Reported Efficacy (%)", color: "hsl(var(--chart-5))" },
 };
 
 export default function ReportsPage() {
@@ -63,13 +73,7 @@ export default function ReportsPage() {
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={chartData}>
                   <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    tickMargin={10}
-                    axisLine={false}
-                    tickFormatter={(value) => value.slice(0, 3)}
-                  />
+                  <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value.slice(0, 3)}/>
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <ChartLegend content={<ChartLegendContent />} />
@@ -81,25 +85,20 @@ export default function ReportsPage() {
         </Card>
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>Sales Trends</CardTitle>
-            <CardDescription>Monthly sales performance in thousands of dollars.</CardDescription>
+            <CardTitle>Overall Sales Trends</CardTitle>
+            <CardDescription>Monthly sales performance in thousands of dollars (Total & Medical).</CardDescription>
           </CardHeader>
           <CardContent>
              <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={chartData}>
                   <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    tickMargin={10}
-                    axisLine={false}
-                    tickFormatter={(value) => value.slice(0, 3)}
-                  />
+                  <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value.slice(0, 3)}/>
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <ChartLegend content={<ChartLegendContent />} />
-                  <Bar dataKey="sales" fill="var(--color-sales)" radius={4} />
+                  <Bar dataKey="sales" fill="var(--color-sales)" radius={4} name="Total Sales"/>
+                  <Bar dataKey="medRevenue" fill="var(--color-medRevenue)" radius={4} name="Medical Revenue" />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -157,6 +156,47 @@ export default function ReportsPage() {
             </div>
         </CardContent>
       </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+            <CardTitle className="flex items-center"><HeartPulse className="mr-2 h-5 w-5 text-primary"/>Medical Sales & Patient Analytics</CardTitle>
+            <CardDescription>Insights specific to medical cannabis sales and patient demographics.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6 md:grid-cols-2">
+            <div className="p-4 border rounded-lg shadow-sm">
+                <h4 className="font-semibold text-md mb-2">Top Conditions Treated (Patient Count)</h4>
+                <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
+                    <ResponsiveContainer width="100%" height={250}>
+                        <PieChart>
+                            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                            <Pie data={medicalAnalyticsData.topConditions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                                {medicalAnalyticsData.topConditions.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <ChartLegend content={<ChartLegendContent nameKey="name" />} />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </ChartContainer>
+            </div>
+            <div className="p-4 border rounded-lg shadow-sm">
+                <h4 className="font-semibold text-md mb-2">Conceptual Product Efficacy (%)</h4>
+                 <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
+                    <ResponsiveContainer width="100%" height={250}>
+                        <BarChart data={medicalAnalyticsData.productEfficacy} layout="vertical">
+                        <CartesianGrid horizontal={false} />
+                        <XAxis type="number" domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+                        <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} width={120} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Bar dataKey="efficacy" fill="var(--color-productEfficacy)" radius={4} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </ChartContainer>
+                <p className="text-xs text-muted-foreground mt-2">Note: Product efficacy data is conceptual and would depend on patient-reported outcomes or specific study data integration.</p>
+            </div>
+        </CardContent>
+      </Card>
+
 
       <Card className="mt-6">
         <CardHeader>

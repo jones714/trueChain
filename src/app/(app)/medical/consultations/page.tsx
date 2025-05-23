@@ -82,13 +82,12 @@ export default function ConsultationManagementPage() {
         
         <Card>
           <CardHeader>
-            <CardTitle>Pre-Consult Intake Forms</CardTitle>
-            <CardDescription>Allow patients to provide information before their consultation.</CardDescription>
+            <CardTitle>Pre-Consult Digital Intake Forms</CardTitle>
+            <CardDescription>Allow patients to securely provide symptoms, medical history, cannabis experience, and product preferences before their consultation to streamline the visit.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">Manage and send intake forms. Patients can fill out symptoms, medical history, previous experiences, or product preferences in advance.</p>
-            <Button variant="outline">Manage Intake Forms</Button>
-            <Button>Send New Intake Form</Button>
+            <Button variant="outline" className="w-full">Manage Intake Form Templates</Button>
+            <Button className="w-full">Send New Intake Form to Patient</Button>
           </CardContent>
         </Card>
 
@@ -98,20 +97,20 @@ export default function ConsultationManagementPage() {
             <CardDescription>Standardize consultation documentation with pre-defined templates.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">Auto-fill structured notes: condition discussed, product recommended, treatment duration, follow-up actions.</p>
-            <Button variant="outline">Manage Templates</Button>
-            <Button>Create New Template</Button>
+            <p className="text-sm text-muted-foreground">Auto-fill structured notes: condition discussed, product recommended (with dosage), treatment duration, follow-up actions. Integrates with patient profile.</p>
+            <Button variant="outline" className="w-full">Manage Note Templates</Button>
+            <Button className="w-full">Create New Template</Button>
           </CardContent>
         </Card>
 
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Consult-to-Prescription Flow</CardTitle>
-            <CardDescription>Streamline product recommendations post-consultation.</CardDescription>
+            <CardDescription>Streamline product recommendations and prescription generation post-consultation.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">After a consultation, easily and instantly recommend and assign specific products to a patient's profile with one click, linking the consultation notes to the recommendation.</p>
-            <Button disabled><LinkIcon className="mr-2 h-4 w-4"/> Link to Patient Profile (Action Placeholder)</Button>
+            <p className="text-sm text-muted-foreground">After a consultation, easily and instantly generate or update a patient's prescription/recommendation. Link specific products from inventory to the patient's profile, respecting dosage limits and condition eligibility. This action is logged and updates the patient's active recommendations.</p>
+            <Button disabled><LinkIcon className="mr-2 h-4 w-4"/> Link to Patient Profile & Create/Update Recommendation (Action Placeholder)</Button>
           </CardContent>
         </Card>
       </div>

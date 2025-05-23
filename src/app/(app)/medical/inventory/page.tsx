@@ -15,7 +15,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"; // Assuming Select component is available
+} from "@/components/ui/select"; 
 
 export default function MedicalInventoryPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,7 +32,7 @@ export default function MedicalInventoryPage() {
     <PageContainer>
       <PageHeader 
         title="Medical Inventory Management" 
-        description="Manage cannabis products for medical patients. Includes med-only tagging, condition-based eligibility, access restrictions, and detailed product suitability data."
+        description="Manage cannabis products for medical patients. Includes med-only tagging, condition-based eligibility via a suitability matrix, access restrictions, and detailed product suitability data."
       >
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" /> Add Medical Product
@@ -43,7 +43,7 @@ export default function MedicalInventoryPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <CardTitle>Medical Product Stock</CardTitle>
-              <CardDescription>View, edit, or add medical cannabis products. Apply med-only tags, manage condition eligibility, and check prescription compatibility.</CardDescription>
+              <CardDescription>View, edit, or add medical cannabis products. Apply med-only tags, manage condition eligibility using a product-condition matrix, and check prescription compatibility.</CardDescription>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <Input 
@@ -73,11 +73,11 @@ export default function MedicalInventoryPage() {
                                 <SelectItem value="epilepsy">Epilepsy (Low-THC)</SelectItem>
                             </SelectContent>
                         </Select>
-                        <p className="text-xs text-muted-foreground mt-1">View products suitable for specific qualifying conditions. Inventory can be tagged with eligible conditions, potentially automated based on COA data.</p>
+                        <p className="text-xs text-muted-foreground mt-1">View products suitable for specific qualifying conditions. Inventory can be tagged with eligible conditions, potentially automated based on COA data and a configurable Condition-Product Suitability Matrix.</p>
                     </div>
                     <div>
                         <h4 className="text-sm font-medium mb-1 flex items-center"><AlertCircle className="mr-1 h-4 w-4 text-orange-500"/>Prescription Compatibility Checker</h4>
-                        <p className="text-xs text-muted-foreground">System will alert if selected inventory does not match any currently active patient recommendations or dosage limits. (Placeholder)</p>
+                        <p className="text-xs text-muted-foreground">System will alert if selected inventory does not match any currently active patient recommendations, dosage limits, or condition eligibility via the suitability matrix. (Placeholder)</p>
                     </div>
                 </div>
             </div>
@@ -91,10 +91,10 @@ export default function MedicalInventoryPage() {
                 <li>Product Name, Strain, Batch Number, Quantity</li>
                 <li className="flex items-center"><Tag className="h-3 w-3 mr-1 text-primary"/>Med-Only Tags & Access Restrictions</li>
                 <li>Patient-Specific Allocations (if applicable)</li>
-                <li><Info className="h-3 w-3 mr-1 text-blue-500"/>THC%, CBD%, Terpene Profile, Strain Type, Intended Effects (auto-displayed suitability data)</li>
-                <li><ListFilter className="h-3 w-3 mr-1 text-green-500"/>Condition-Based Product Eligibility Tags</li>
+                <li><Info className="h-3 w-3 mr-1 text-blue-500"/>Auto-displayed Suitability Data: THC%, CBD%, Terpene Profile, Strain Type, Intended Effects</li>
+                <li><ListFilter className="h-3 w-3 mr-1 text-green-500"/>Condition-Based Product Eligibility Tags (derived from matrix)</li>
             </ul>
-             <p className="text-xs mt-2">Access to certain products may be restricted based on user role, patient profile, and specific qualifying conditions.</p>
+             <p className="text-xs mt-2">Access to certain products may be restricted based on user role, patient profile, and specific qualifying conditions defined in the suitability matrix.</p>
           </div>
         </CardContent>
       </Card>
