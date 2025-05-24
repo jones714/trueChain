@@ -12,7 +12,7 @@ export default function InventoryPage() {
     <PageContainer>
       <PageHeader 
         title="Comprehensive Inventory Management" 
-        description="Track cannabis products (bulk, packaged, sold), operational hardware, and ensure full traceability across multiple facilities and licenses.">
+        description="Track cannabis products (bulk, packaged, sold), operational hardware, and ensure full traceability across multiple facilities and licenses. Includes tracking for non-METRC/sample batches.">
         <div className="flex flex-wrap gap-2">
           <Button>
             <PlusCircle className="mr-2 h-4 w-4" /> Add Item
@@ -73,7 +73,7 @@ export default function InventoryPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
                     <CardTitle>Detailed Inventory List</CardTitle>
-                    <CardDescription>Comprehensive view of all items (cannabis & hardware) with METRC tags, quantities, locations, batch data (test results, waste logs, source), and status. Supports multi-location and multi-license views.</CardDescription>
+                    <CardDescription>Comprehensive view of all items (cannabis & hardware) with METRC tags, quantities, locations, batch data (test results, waste logs, source), and status. Supports multi-location, multi-license views, and tracking of non-METRC/sample batches.</CardDescription>
                 </div>
                  <div className="flex items-center gap-2">
                     <Input placeholder="Search inventory (tag, name, batch...)" className="max-w-xs" />
@@ -145,5 +145,3 @@ export default function InventoryPage() {
     </PageContainer>
   );
 }
-
-    

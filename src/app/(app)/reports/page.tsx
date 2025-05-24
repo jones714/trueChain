@@ -5,7 +5,7 @@ import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Download, Filter, Brain, AlertTriangle, Map, TrendingUp, FileCheck2, CalendarSearch, HeartPulse, Activity } from "lucide-react";
+import { BarChart3, Download, Filter, Brain, AlertTriangle, Map, TrendingUp, FileCheck2, CalendarSearch, HeartPulse, Activity, DollarSign } from "lucide-react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -13,15 +13,15 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Pie, PieChart, Cell } from "recharts"; // Added Pie, PieChart, Cell
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Pie, PieChart, Cell } from "recharts"; 
 
 const chartData = [
-  { month: "January", yield: 186, sales: 80, efficiency: 0.15, medRevenue: 30 },
-  { month: "February", yield: 305, sales: 200, efficiency: 0.18, medRevenue: 75 },
-  { month: "March", yield: 237, sales: 120, efficiency: 0.16, medRevenue: 40 },
-  { month: "April", yield: 73, sales: 190, efficiency: 0.12, medRevenue: 60 },
-  { month: "May", yield: 209, sales: 130, efficiency: 0.17, medRevenue: 50 },
-  { month: "June", yield: 214, sales: 140, efficiency: 0.19, medRevenue: 55 },
+  { month: "January", yield: 186, sales: 80, efficiency: 0.15, medRevenue: 30, cogs: 40, wasteCost: 5 },
+  { month: "February", yield: 305, sales: 200, efficiency: 0.18, medRevenue: 75, cogs: 90, wasteCost: 8 },
+  { month: "March", yield: 237, sales: 120, efficiency: 0.16, medRevenue: 40, cogs: 55, wasteCost: 6 },
+  { month: "April", yield: 73, sales: 190, efficiency: 0.12, medRevenue: 60, cogs: 80, wasteCost: 3 },
+  { month: "May", yield: 209, sales: 130, efficiency: 0.17, medRevenue: 50, cogs: 60, wasteCost: 7 },
+  { month: "June", yield: 214, sales: 140, efficiency: 0.19, medRevenue: 55, cogs: 65, wasteCost: 4 },
 ];
 
 const medicalAnalyticsData = {
@@ -47,12 +47,14 @@ const chartConfig = {
   efficiency: { label: "Extraction Efficiency (%)", color: "hsl(var(--chart-3))" },
   topConditions: { label: "Patient Count" },
   productEfficacy: { label: "Reported Efficacy (%)", color: "hsl(var(--chart-5))" },
+  cogs: { label: "COGS ($K)", color: "hsl(var(--chart-4))"},
+  wasteCost: { label: "Cost of Waste ($K)", color: "hsl(var(--destructive))"},
 };
 
 export default function ReportsPage() {
   return (
     <PageContainer>
-      <PageHeader title="Interactive Reports &amp; Analytics" description="Visualize yields, sales, inventory, compliance, and gain deeper business insights.">
+      <PageHeader title="Interactive Reports &amp; Analytics" description="Visualize yields, sales, inventory, compliance, profitability, and gain deeper business insights.">
          <div className="flex items-center space-x-2">
             <Button variant="outline">
                 <Filter className="mr-2 h-4 w-4" /> Filters
@@ -157,6 +159,55 @@ export default function ReportsPage() {
         </CardContent>
       </Card>
 
+       <Card className="mt-6">
+        <CardHeader>
+            <CardTitle className="flex items-center"><DollarSign className="mr-2 h-5 w-5 text-primary"/>COGS &amp; Profitability Analysis</CardTitle>
+            <CardDescription>Gain insights into Cost of Goods Sold, gross margin per SKU, cost per batch, and the financial impact of waste.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6 md:grid-cols-2">
+            <div className="p-4 border rounded-lg shadow-sm">
+                <h4 className="font-semibold text-md mb-2">COGS vs Sales Trend ($K)</h4>
+                <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
+                    <ResponsiveContainer width="100%" height={250}>
+                         <BarChart data={chartData}>
+                            <CartesianGrid vertical={false} />
+                            <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value.slice(0, 3)}/>
+                            <YAxis />
+                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <ChartLegend content={<ChartLegendContent />} />
+                            <Bar dataKey="sales" fill="var(--color-sales)" radius={4} name="Total Sales"/>
+                            <Bar dataKey="cogs" fill="var(--color-cogs)" radius={4} name="COGS"/>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </ChartContainer>
+            </div>
+            <div className="p-4 border rounded-lg shadow-sm">
+                <h4 className="font-semibold text-md mb-2">Cost of Waste ($K)</h4>
+                 <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
+                    <ResponsiveContainer width="100%" height={250}>
+                        <BarChart data={chartData}>
+                            <CartesianGrid vertical={false} />
+                            <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value.slice(0, 3)}/>
+                            <YAxis />
+                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <Bar dataKey="wasteCost" fill="var(--color-wasteCost)" radius={4} name="Cost of Waste"/>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </ChartContainer>
+                 <p className="text-xs text-muted-foreground mt-2">Track the financial impact of product and plant waste.</p>
+            </div>
+             <div className="md:col-span-2 p-4 border rounded-lg shadow-sm bg-muted/30">
+                <h4 className="font-semibold text-md mb-1">Key Profitability Insights</h4>
+                <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1 mt-2">
+                    <li>Average gross margin per SKU: <strong>45%</strong> (Conceptual)</li>
+                    <li>Cost per batch produced (avg): <strong>$250.00</strong> (Conceptual)</li>
+                    <li>Highest margin product category: <strong>Vape Cartridges</strong> (Conceptual)</li>
+                </ul>
+                <Button variant="link" size="sm" className="p-0 h-auto text-primary text-xs mt-3">View Detailed Profitability Reports</Button>
+            </div>
+        </CardContent>
+      </Card>
+
       <Card className="mt-6">
         <CardHeader>
             <CardTitle className="flex items-center"><HeartPulse className="mr-2 h-5 w-5 text-primary"/>Medical Sales & Patient Analytics</CardTitle>
@@ -201,14 +252,14 @@ export default function ReportsPage() {
       <Card className="mt-6">
         <CardHeader>
             <CardTitle>Business Intelligence Insights</CardTitle>
-            <CardDescription>Aggregate KPIs and advanced analytics for strategic decision-making.</CardDescription>
+            <CardDescription>Aggregate KPIs and advanced analytics for strategic decision-making (e.g., sales velocity by SKU, lab pass rates by supplier, customer retention).</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div className="p-4 border rounded-lg shadow-sm">
                 <Brain className="h-6 w-6 text-primary mb-2" />
                 <h4 className="font-semibold text-md mb-1">Insights Dashboard</h4>
                 <p className="text-xs text-muted-foreground">
-                    Role-based KPIs: best-selling SKUs, yield per batch, failed tests by vendor, operational efficiency metrics, and more.
+                    Role-based KPIs: best-selling SKUs, yield per batch, failed tests by vendor, operational efficiency metrics, sales velocity, lab pass rates, customer retention, and more.
                 </p>
                  <div className="mt-3 p-4 bg-muted/50 rounded-md text-center text-xs text-muted-foreground">
                     Detailed KPI visualizations here.

@@ -24,43 +24,42 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   PlusCircle,
-  Filter,
-  Sprout, // General plant icon
-  Droplets, // Germination
-  Flower2, // Flowering
-  Scissors, // Harvested / Harvest action
-  Trash2, // Destroy
-  Printer, // Print Tags
-  Thermometer, // Environment
-  Cloud, // CO2
-  Bug, // Pest
+  Sprout, 
+  Droplets, 
+  Flower2, 
+  Scissors, 
+  Trash2, 
+  Printer, 
+  Thermometer, 
+  Cloud, 
+  Bug, 
   PieChart,
   BarChart2,
-  Activity, // Logs / Activity
-  Tag, // METRC Tag
-  Eye, // View Details
-  CheckCircle2, // Synced / Pass
-  AlertTriangle, // Error / At Risk / Overdue / Fail
-  Archive, // Batch ID / Archive action
+  Activity, 
+  Tag, 
+  Eye, 
+  CheckCircle2, 
+  AlertTriangle, 
+  Archive, 
   CalendarDays,
   MapPin,
   ListFilter,
-  FileEdit, // Log Activity
-  CameraIcon, // Upload
+  FileEdit, 
+  CameraIcon, 
   MoreHorizontal,
-  Move, // Move Plants
-  GitFork, // Clone Batch
-  MessageSquare, // Notes indicator
-  ShieldQuestion, // QA Untested
-  ShieldCheck, // QA Pass
-  ShieldAlert, // QA Fail
-  TrendingUp, // On Track
-  TrendingDown, // At Risk / Needs Review
-  UploadCloud, // Upload lab results
-  BookOpen, // View logs
-  Wrench, // Log custom activity
-  ClipboardList, // Log harvest & yield
-  Clock // Added Clock icon
+  Move, 
+  GitFork, 
+  MessageSquare, 
+  ShieldQuestion, 
+  ShieldCheck, 
+  ShieldAlert, 
+  TrendingUp, 
+  TrendingDown, 
+  UploadCloud, 
+  BookOpen, 
+  Wrench, 
+  ClipboardList,
+  Clock 
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -260,7 +259,7 @@ export default function PlantsLifecycleDashboardPage() {
     <PageContainer>
       <PageHeader
         title="Plant Lifecycle Dashboard"
-        description="Monitor, log, and manage all cannabis plant batches from seed to post-harvest. Click 'Create Plant Batch' to start a new batch (select strain, quantity, origin, room, start stage, date, notes).">
+        description="Monitor, log, and manage all cannabis plant batches from seed to post-harvest. Click 'Create Plant Batch' to start a new batch (select strain, quantity, origin, room, start stage, date, notes; option for 'Sample Batch' to exclude from METRC).">
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" /> Create Plant Batch
         </Button>
@@ -375,8 +374,8 @@ export default function PlantsLifecycleDashboardPage() {
                     <Badge variant={batch.qaStatus === 'Pass' ? 'default' : batch.qaStatus === 'Fail' ? 'destructive' : 'secondary'} 
                            className={cn(
                             batch.qaStatus === 'Pass' && "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-                            batch.qaStatus === 'Untested' && "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300", // Example for untested
-                            batch.qaStatus === 'Fail' && "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" // Ensure fail is destructive like
+                            batch.qaStatus === 'Untested' && "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300", 
+                            batch.qaStatus === 'Fail' && "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" 
                            )}
                     >
                         <QAIcon className="h-3.5 w-3.5 mr-1"/>{batch.qaStatus}
@@ -451,7 +450,6 @@ export default function PlantsLifecycleDashboardPage() {
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Batches Awaiting QA</CardTitle><ShieldQuestion className="h-4 w-4 text-muted-foreground" /></CardHeader>
               <CardContent><div className="text-2xl font-bold">{initialPlantBatches.filter(b => b.qaStatus === 'Untested' && b.status === 'Active').length}</div></CardContent>
             </Card>
-            {/* Placeholder for Stage Distribution Pie Chart */}
              <Card className="sm:col-span-2">
                  <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Stage Distribution (Active Batches)</CardTitle></CardHeader>
                  <CardContent className="text-center text-muted-foreground py-4">[Pie Chart: Germ: X%, Veg: Y%, Flower: Z%]</CardContent>

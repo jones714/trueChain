@@ -11,7 +11,7 @@ import {
   AlertTriangle, BarChart3, Bell, BriefcaseMedical, CalendarClock, CheckCircle2, Cog,
   DollarSign, FileText, Filter, GaugeCircle, Leaf, ListChecks, LucideIcon, Package,
   Palette, Route, Settings2, ShieldAlert, ShoppingCart, Sprout, Star, Sun,
-  Thermometer, Users, Workflow, TrendingUp, Clock, Lightbulb, Truck, PackageSearch, Archive, NotebookText, FlaskConical, UserPlus
+  Thermometer, Users, Workflow, TrendingUp, Clock, Lightbulb, Truck, PackageSearch, Archive, NotebookText, FlaskConical, UserPlus, ListFilter as ListFilterIcon // Added ListFilterIcon alias
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -43,6 +43,7 @@ const timelineEvents = [
   { id: "T002", time: "In 2 Hours", event: "Drying cycle for batch DRY-034 completes.", icon: Clock, iconColor: "text-green-500" },
   { id: "T003", time: "Tomorrow 9 AM", event: "Scheduled destruction event WST-EVT-012.", icon: Archive, iconColor: "text-gray-500" },
   { id: "T004", time: "Yesterday 3 PM", event: "Harvest HVT-105 completed. Yield: 2.5kg.", icon: Sprout, iconColor: "text-primary" },
+  { id: "T005", time: "Next Week", event: "Patient Appointment: John D. - Follow-up.", icon: BriefcaseMedical, iconColor: "text-purple-500"},
 ];
 
 const salesTrendData = [
@@ -90,7 +91,7 @@ const upcomingAppointments = [
 const productSpotlight = {
     name: "Sunset Sherbet Flower",
     salesIncrease: "+15% this week",
-    image: "/poo2.webp", // Corrected from placehold.co based on previous interaction
+    image: "/poo2.webp",
     dataAiHint: "cannabis flower"
 };
 
@@ -103,7 +104,7 @@ export default function DashboardPageV2() {
     <PageContainer>
       <PageHeader
         title="TruCanalytix Command Center"
-        description="Welcome back! This is your dynamic, real-time overview. Widgets are role-aware and can be customized (drag-and-drop, hide/show - conceptual)."
+        description={`Welcome back! This is your dynamic, real-time overview. Widgets are role-aware (Cultivator, Processor, Retail Clerk, etc.) and can be customized (drag-and-drop, hide/show - conceptual) to display relevant KPIs and tools based on your responsibilities.`}
       >
         <Button variant="outline" size="sm">
           <Settings2 className="mr-2 h-4 w-4" /> Customize Dashboard
@@ -161,7 +162,7 @@ export default function DashboardPageV2() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center"><AlertTriangle className="mr-2 h-5 w-5 text-destructive" />Real-Time Alerts</CardTitle>
-              <CardDescription>Critical compliance violations and operational issues requiring attention.</CardDescription>
+              <CardDescription>Critical compliance violations, operational issues, lab result failures, overdue transfers, low inventory, or expiring licenses.</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-48">
@@ -185,7 +186,7 @@ export default function DashboardPageV2() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center"><BarChart3 className="mr-2 h-5 w-5 text-primary" />Mini Analytics</CardTitle>
-              <CardDescription>Quick insights into key performance areas. (Sparkline charts are conceptual here)</CardDescription>
+              <CardDescription>Quick insights into key performance areas. (Sparkline charts are conceptual here for sales, strain yield, lab pass/fail etc.)</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -203,11 +204,11 @@ export default function DashboardPageV2() {
             </CardContent>
           </Card>
 
-          {/* Timeline Module */}
+          {/* Timeline Module / Calendar View */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center"><CalendarClock className="mr-2 h-5 w-5 text-primary" />Operational Timeline</CardTitle>
-              <CardDescription>Upcoming and recent key events across your operations.</CardDescription>
+              <CardTitle className="flex items-center"><CalendarClock className="mr-2 h-5 w-5 text-primary" />Operational Timeline & Calendar</CardTitle>
+              <CardDescription>Visual schedule of upcoming and recent key events, including drying cycles, lab sample pickups, manifest delivery windows, patient appointments, and other critical tasks.</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-48">
@@ -339,14 +340,26 @@ export default function DashboardPageV2() {
             </Card>
           )}
 
-          {/* Optional: Notifications Widget */}
+          {/* Notification Center Widget */}
           <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center"><Bell className="mr-2 h-5 w-5 text-primary"/>Notifications</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="flex items-center text-base font-semibold"><Bell className="mr-2 h-5 w-5 text-primary"/>Notification Center</CardTitle>
+                <Button variant="ghost" size="icon" className="h-7 w-7"><ListFilterIcon className="h-4 w-4"/></Button>
             </CardHeader>
             <CardContent>
-                <p className="text-xs text-muted-foreground text-center py-4">[Notification Inbox Placeholder: System alerts, flagged issues, team messages]</p>
-                <Button variant="outline" size="sm" className="w-full text-xs">View All Notifications</Button>
+                <CardDescription className="text-xs mb-2">Centralized inbox for system alerts, compliance flags, event reminders, and team messages. Filter by severity or type.</CardDescription>
+                <ScrollArea className="h-32">
+                    {/* Conceptual notification items */}
+                    <div className="text-xs mb-1.5 p-1.5 border-l-2 border-destructive/50 bg-destructive/5 rounded-r-sm">
+                        <p className="font-medium">METRC Sync Failed (High)</p>
+                        <p className="text-muted-foreground">3 packages unsynced. <Link href="#" className="text-primary hover:underline">Details</Link></p>
+                    </div>
+                     <div className="text-xs mb-1.5 p-1.5 border-l-2 border-yellow-500/50 bg-yellow-500/5 rounded-r-sm">
+                        <p className="font-medium">License Expiry Reminder (Medium)</p>
+                        <p className="text-muted-foreground">Facility A license expires in 15 days. <Link href="#" className="text-primary hover:underline">Renew</Link></p>
+                    </div>
+                </ScrollArea>
+                <Button variant="outline" size="sm" className="w-full text-xs mt-3">View All Notifications</Button>
             </CardContent>
           </Card>
 
@@ -365,5 +378,3 @@ export default function DashboardPageV2() {
     </PageContainer>
   );
 }
-
-    
