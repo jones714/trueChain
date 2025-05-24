@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils"; // Added import
 
 const completedTests = [
     { id: "TEST-001", requestId: "REQ-001", sourceBatch: "HVT-001", lab: "Anresco Labs", thc: "22.5%", cbd: "0.8%", contaminants: "None Detected", status: "Pass", dateCompleted: "2023-11-02", coaUrl: "#", comments: ""},
