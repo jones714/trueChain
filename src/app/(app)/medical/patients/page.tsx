@@ -24,8 +24,8 @@ export default function PatientProfilesPage() {
       dataAiHint: "man casual",
       conditions: ["Chronic Pain (since 2022-01-10 by Dr. Smith)", "Insomnia (since 2023-03-05 by Dr. Jones)"],
       recommendations: [
-        {product: "CBD Tincture 500mg", dosage: "1ml twice daily", forCondition: "Chronic Pain", startDate: "2023-10-15", endDate: "2024-04-15"},
-        {product: "Indica Flower XYZ", dosage: "0.5g as needed for sleep", forCondition: "Insomnia", startDate: "2023-10-15", endDate: "2024-01-15"}
+        {id: "REC001", product: "CBD Tincture 500mg", dosage: "1ml twice daily", forCondition: "Chronic Pain", startDate: "2023-10-15", endDate: "2024-04-15", refillsRemaining: 2},
+        {id: "REC002", product: "Indica Flower XYZ", dosage: "0.5g as needed for sleep", forCondition: "Insomnia", startDate: "2023-10-15", endDate: "2024-01-15", refillsRemaining: 0}
       ],
       refillCount: 3,
       nextRefillDue: "2024-01-15",
@@ -41,7 +41,7 @@ export default function PatientProfilesPage() {
       dataAiHint: "woman professional",
       conditions: ["Anxiety (since 2021-07-20 by Dr. Alpha)"],
       recommendations: [
-         {product: "Hybrid Vape Cartridge ABC", dosage: "1-2 puffs as needed", forCondition: "Anxiety", startDate: "2023-11-01", endDate: "2024-05-01"}
+         {id: "REC003", product: "Hybrid Vape Cartridge ABC", dosage: "1-2 puffs as needed", forCondition: "Anxiety", startDate: "2023-11-01", endDate: "2024-05-01", refillsRemaining: 3}
       ],
       refillCount: 1,
       nextRefillDue: "2024-02-01",
@@ -57,8 +57,8 @@ export default function PatientProfilesPage() {
       dataAiHint: "man glasses",
       conditions: ["Epilepsy (Low-THC) (since 2020-05-01 by Dr. Beta)"],
       recommendations: [
-        {product: "Low-THC Oil (1:20)", dosage: "0.5ml three times daily", forCondition: "Epilepsy", startDate: "2023-09-20", endDate: "2024-03-20"},
-        {product: "CBD Capsules 25mg", dosage: "1 capsule daily", forCondition: "Epilepsy", startDate: "2023-09-20", endDate: "2024-03-20"}
+        {id: "REC004", product: "Low-THC Oil (1:20)", dosage: "0.5ml three times daily", forCondition: "Epilepsy", startDate: "2023-09-20", endDate: "2024-03-20", refillsRemaining: 1},
+        {id: "REC005", product: "CBD Capsules 25mg", dosage: "1 capsule daily", forCondition: "Epilepsy", startDate: "2023-09-20", endDate: "2024-03-20", refillsRemaining: 1}
       ],
       refillCount: 5,
       nextRefillDue: "2024-01-25",
@@ -89,7 +89,7 @@ export default function PatientProfilesPage() {
     <PageContainer>
       <PageHeader 
         title="Patient Profile Management" 
-        description="Manage patient information, medical conditions & timelines, prescriptions/recommendations, track dosage limits, refill history, and provider integrations (state ID sync, doctor's notes)."
+        description="Manage patient information, medical conditions & timelines, prescriptions/recommendations (with dosage limits and refill status), track purchase limits, refill history, and provider integrations (state ID sync, doctor's notes)."
       >
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" /> Add New Patient
@@ -100,7 +100,7 @@ export default function PatientProfilesPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <div>
               <CardTitle>Registered Patients</CardTitle>
-              <CardDescription>View, edit, or add patient profiles. Includes State ID validation and HIPAA-compliant access logs.</CardDescription>
+              <CardDescription>View, edit, or add patient profiles. Includes State ID validation and HIPAA-compliant access logs. Mock data for demo.</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <Input 
@@ -157,10 +157,10 @@ export default function PatientProfilesPage() {
                             <h4 className="font-medium text-xs text-muted-foreground mb-1 flex items-center"><Pill className="h-4 w-4 mr-1 text-primary"/>Prescriptions / Recommendations</h4>
                             {patient.recommendations.length > 0 ? 
                                  <ul className="list-disc list-inside text-foreground space-y-0.5 text-xs">
-                                    {patient.recommendations.map(p => <li key={p.product}>{p.product} ({p.dosage}) - For: {p.forCondition} (Until: {p.endDate})</li>)}
+                                    {patient.recommendations.map(p => <li key={p.id}>{p.product} ({p.dosage}) - For: {p.forCondition} (Until: {p.endDate}) - Refills: {p.refillsRemaining}</li>)}
                                 </ul>
                                 : <p className="text-muted-foreground italic text-xs">No active recommendations.</p>}
-                             <Button variant="link" size="sm" className="p-0 h-auto text-xs mt-1 text-primary"><Brain className="h-3 w-3 mr-1"/>Suggest Products</Button>
+                             <Button variant="link" size="sm" className="p-0 h-auto text-xs mt-1 text-primary"><Brain className="h-3 w-3 mr-1"/>Suggest Products (AI)</Button>
                         </div>
                         <div className="lg:col-span-1">
                             <h4 className="font-medium text-xs text-muted-foreground mb-1 flex items-center"><History className="h-4 w-4 mr-1 text-primary"/>Refill History &amp; Dosage</h4>

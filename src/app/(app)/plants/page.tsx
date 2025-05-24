@@ -81,7 +81,7 @@ type MetrcSyncStatus = "synced" | "error" | "pending";
 
 interface PlantBatch {
   id: string;
-  metrcTagId: string;
+  metrcTagId: string; // This can represent RFID or other compliance tags
   strain: string;
   quantity: number;
   currentPhase: PlantStage;
@@ -259,7 +259,7 @@ export default function PlantsLifecycleDashboardPage() {
     <PageContainer>
       <PageHeader
         title="Plant Lifecycle Dashboard"
-        description="Monitor, log, and manage all cannabis plant batches from seed to post-harvest. Click 'Create Plant Batch' to start a new batch (select strain, quantity, origin, room, start stage, date, notes; option for 'Sample Batch' to exclude from METRC).">
+        description="Monitor, log, and manage all cannabis plant batches from seed to post-harvest. Click 'Create Plant Batch' to start a new batch (select strain, quantity/batch size, origin batch if clones, room/location, starting stage, start date, and notes; option for 'Sample Batch' to exclude from METRC, and to print METRC/RFID tags or QR codes).">
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" /> Create Plant Batch
         </Button>
@@ -271,7 +271,7 @@ export default function PlantsLifecycleDashboardPage() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Input 
-            placeholder="Search Batch ID, Tag, Strain, Room..." 
+            placeholder="Search Batch ID, METRC/RFID Tag, Strain, Room..." 
             className="lg:col-span-3"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -325,14 +325,14 @@ export default function PlantsLifecycleDashboardPage() {
         <CardHeader>
           <CardTitle>Plant Batches Overview</CardTitle>
           <CardDescription>
-            Comprehensive list of all plant batches. Click Batch ID for detailed view including logs, compliance metadata, and action history.
+            Comprehensive list of all plant batches. Click Batch ID for detailed view including logs (feeding, watering, health, environment, clone source), compliance metadata (METRC tag, license, origin, action history), photo uploads, and notes. Actions menu provides tools for lifecycle management.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Batch ID</TableHead>
+                <TableHead>Batch ID / Tag</TableHead>
                 <TableHead>Strain</TableHead>
                 <TableHead>Qty</TableHead>
                 <TableHead>Phase</TableHead>
@@ -354,7 +354,9 @@ export default function PlantsLifecycleDashboardPage() {
 
                 return (
                 <TableRow key={batch.id} className={cn(isOverdue && "bg-amber-50 dark:bg-amber-900/30")}>
-                  <TableCell className="font-medium hover:underline cursor-pointer">{batch.id} {batch.hasNotes && <MessageSquare className="inline h-3 w-3 ml-1 text-blue-500"/>}</TableCell>
+                  <TableCell className="font-medium hover:underline cursor-pointer" title={`METRC Tag: ${batch.metrcTagId}`}>
+                    {batch.id} {batch.hasNotes && <MessageSquare className="inline h-3 w-3 ml-1 text-blue-500"/>}
+                  </TableCell>
                   <TableCell>{batch.strain}</TableCell>
                   <TableCell>{batch.quantity}</TableCell>
                   <TableCell>
@@ -410,6 +412,8 @@ export default function PlantsLifecycleDashboardPage() {
                         <DropdownMenuItem><Eye className="mr-2 h-4 w-4" />View Details / Logs</DropdownMenuItem>
                         <DropdownMenuItem><Sprout className="mr-2 h-4 w-4" />Advance Stage</DropdownMenuItem>
                         <DropdownMenuItem><FileEdit className="mr-2 h-4 w-4" />Log Activity/Observation</DropdownMenuItem>
+                        <DropdownMenuItem><Wrench className="mr-2 h-4 w-4" />Log Nutrients/Watering</DropdownMenuItem>
+                        <DropdownMenuItem><Bug className="mr-2 h-4 w-4" />Flag Health Concern</DropdownMenuItem>
                         <DropdownMenuItem><UploadCloud className="mr-2 h-4 w-4" />Upload Lab QA Results</DropdownMenuItem>
                         <DropdownMenuItem><ClipboardList className="mr-2 h-4 w-4" />Log Harvest & Yield</DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -465,7 +469,7 @@ export default function PlantsLifecycleDashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-lg flex items-center"><Thermometer className="mr-2 h-5 w-5"/>Environmental Metrics</CardTitle><CardDescription>Real-time sensor data summary.</CardDescription></CardHeader>
+          <CardHeader><CardTitle className="text-lg flex items-center"><Thermometer className="mr-2 h-5 w-5"/>Environmental Metrics</CardTitle><CardDescription>Real-time sensor data summary for selected batch/room.</CardDescription></CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between p-2 border rounded-md"><div className="flex items-center"><Thermometer className="h-4 w-4 mr-2 text-red-500"/><span className="text-sm">Avg. Temp</span></div><span className="text-sm font-semibold">75°F</span></div>
             <div className="flex items-center justify-between p-2 border rounded-md"><div className="flex items-center"><Droplets className="h-4 w-4 mr-2 text-blue-500"/><span className="text-sm">Avg. Humidity</span></div><span className="text-sm font-semibold">55%</span></div>

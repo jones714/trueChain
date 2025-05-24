@@ -30,7 +30,7 @@ export default function ManifestsPage() {
     <PageContainer>
       <PageHeader 
         title="METRC-Compliant Manifests" 
-        description="Create, manage, and track transfer manifests. Integrates with inventory for package selection (including METRC tags, quantities, weights), assigns driver & vehicle, sets estimated delivery windows, allows attachments, and auto-pushes to METRC. Output includes printable PDFs with QR codes. Changes are synced with METRC."
+        description="Create, manage, and track transfer manifests. Integrates with inventory for package selection (including METRC tags, quantities, weights), assigns driver & vehicle (from registry), sets estimated delivery windows, allows attachments, and can auto-push to METRC. Output includes printable PDFs with QR codes. Changes are synced with METRC."
       >
         <div className="flex flex-wrap gap-2">
             <Button>
@@ -53,11 +53,11 @@ export default function ManifestsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-            <p className="text-sm text-muted-foreground">This area would typically contain a form to create a new manifest or display details of a selected manifest. For example, selecting packages from inventory, assigning driver/vehicle, setting recipients, etc.</p>
+            <p className="text-sm text-muted-foreground">This area would typically contain a form to create a new manifest (selecting packages, driver, vehicle) or display details of a selected manifest.</p>
             <div className="mt-4 p-4 border border-dashed rounded-md text-center text-muted-foreground">
                 <FileSymlink className="mx-auto h-10 w-10 text-muted-foreground/50 mb-2" />
                 <p>Manifest creation form / detailed view placeholder.</p>
-                <p className="text-xs">Fields: Origin, Recipient, <User className="inline h-3 w-3"/>Driver, <TruckIcon className="inline h-3 w-3"/>Vehicle, <Package className="inline h-3 w-3"/>Packages, <Tag className="inline h-3 w-3"/>METRC Tags, <CalendarClock className="inline h-3 w-3"/>ETA, Notes, <Upload className="inline h-3 w-3"/>Attachments.</p>
+                <p className="text-xs">Fields: Origin, Recipient, <User className="inline h-3 w-3"/>Driver, <TruckIcon className="inline h-3 w-3"/>Vehicle, <Package className="inline h-3 w-3"/>Packages (Select from Inventory), <Tag className="inline h-3 w-3"/>METRC Tags (Auto-populated), <CalendarClock className="inline h-3 w-3"/>ETA, Notes, <Upload className="inline h-3 w-3"/>Attachments.</p>
             </div>
         </CardContent>
       </Card>
@@ -65,7 +65,7 @@ export default function ManifestsPage() {
       <Card className="mt-6">
         <CardHeader>
           <CardTitle>All Manifests</CardTitle>
-          <CardDescription>List of all generated manifests with their current status. Role-based access controls apply.</CardDescription>
+          <CardDescription>List of all generated manifests with their current status. Role-based access controls apply. Mock data used for demo.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -111,7 +111,7 @@ export default function ManifestsPage() {
                         <TableCell className="text-right">
                             <Button variant="ghost" size="icon" title="View Details"><FileText className="h-4 w-4"/></Button>
                             <Button variant="ghost" size="icon" title="Print Manifest"><Printer className="h-4 w-4"/></Button>
-                            <Button variant="ghost" size="icon" title="Sign Manifest"><Edit3 className="h-4 w-4"/></Button>
+                            <Button variant="ghost" size="icon" title="Edit/Dispatch Manifest"><Edit3 className="h-4 w-4"/></Button>
                         </TableCell>
                     </TableRow>
                 ))}

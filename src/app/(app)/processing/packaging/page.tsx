@@ -14,10 +14,11 @@ import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 
 interface ReadyToPackItem {
-  id: string; // Source batch ID (e.g., CUR-001, EXT-005)
+  id: string; // Source batch ID (e.g., CUR-001, EXT-005, PROC-2024-003)
   type: "Cured Flower" | "Trim" | "Extract" | "Infused Product Base";
   strainOrProductName: string;
-  availableWeight: number; // grams
+  availableWeightOrUnits: number; // grams or base units
+  unitType: "g" | "units";
 }
 
 interface PackagingRun {
@@ -26,30 +27,29 @@ interface PackagingRun {
   productSku: string; // e.g., SKU-FLWR-BC-3.5G
   packagingMaterialsUsed: { name: string; quantity: number }[];
   unitsCreated: number;
-  finalBatchWeight: number; // grams
+  finalBatchWeight?: number; // grams (optional, relevant for bulk flower)
   metrcPackageTag?: string;
   staff: string;
-  rejectsWaste: number; // grams
+  rejectsWaste: number; // grams or units
   dateStarted: string;
   dateCompleted?: string;
+  status: "Active" | "Completed" | "On Hold";
 }
 
 export default function PackagingPage() {
   const [readyItems, setReadyItems] = useState<ReadyToPackItem[]>([
-    { id: "CUR-001", type: "Cured Flower", strainOrProductName: "Blue Dream", availableWeight: 1100 },
-    { id: "EXT-005", type: "Extract", strainOrProductName: "OG Kush Distillate", availableWeight: 250 },
+    { id: "CUR-001", type: "Cured Flower", strainOrProductName: "Blue Dream", availableWeightOrUnits: 1100, unitType: "g" },
+    { id: "EXT-005", type: "Extract", strainOrProductName: "OG Kush Distillate", availableWeightOrUnits: 250, unitType: "g" },
+    { id: "PROC-2024-003", type: "Infused Product Base", strainOrProductName: "Gummy Base", availableWeightOrUnits: 280, unitType: "g" },
   ]);
 
   const [activeRuns, setActiveRuns] = useState<PackagingRun[]>([]);
-
-  // TODO: Form to start new packaging run
-  // TODO: Display active runs and allow completion/editing
 
   return (
     <PageContainer>
       <PageHeader 
         title="Packaging & Labeling" 
-        description="Manage packaging of processed and manufactured products, assign METRC tags, and generate compliant labels. Track material usage and yields."
+        description="Manage packaging of processed and manufactured products, assign METRC tags, and generate compliant labels. Track material usage, yields, and mark packages as 'ready' for inventory/transfer."
       >
         <div className="flex flex-wrap gap-2">
           <Button><PlusCircle className="mr-2 h-4 w-4" /> Start New Packaging Run</Button>
@@ -62,7 +62,7 @@ export default function PackagingPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>Materials Ready for Packaging</CardTitle>
-                    <CardDescription>Select source material to begin a packaging run.</CardDescription>
+                    <CardDescription>Select source material to begin a packaging run. Status changes to 'Packaged' upon completion.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {readyItems.length === 0 && <p className="text-muted-foreground text-center py-4">No materials currently marked ready for packaging.</p>}
@@ -70,7 +70,7 @@ export default function PackagingPage() {
                         {readyItems.map(item => (
                             <Card key={item.id} className="p-3 bg-muted/30">
                                 <h4 className="font-semibold">{item.strainOrProductName} ({item.type})</h4>
-                                <p className="text-xs text-muted-foreground">ID: {item.id} | Available: {item.availableWeight}g</p>
+                                <p className="text-xs text-muted-foreground">ID: {item.id} | Available: {item.availableWeightOrUnits}{item.unitType}</p>
                                 <Button size="sm" className="w-full mt-2">Start Packaging</Button>
                             </Card>
                         ))}
@@ -92,22 +92,22 @@ export default function PackagingPage() {
           <Card>
             <CardHeader>
               <CardTitle>Start/Manage Packaging Run</CardTitle>
-              <CardDescription>Define parameters for a new packaging run or manage an active one.</CardDescription>
+              <CardDescription>Define parameters for a new packaging run or manage an active one. Finalized packages are marked 'ready' for sale/transfer.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* This would be a more complex form, simplified here */}
               <div>
                 <Label htmlFor="source-material">Source Material ID</Label>
-                <Input id="source-material" placeholder="e.g., CUR-001" />
+                <Input id="source-material" placeholder="e.g., CUR-001 or PROC-2024-003" />
               </div>
               <div>
-                <Label htmlFor="product-sku">Product SKU / Name</Label>
+                <Label htmlFor="product-sku">Product SKU / Name (Finished Good)</Label>
                 <Select>
                   <SelectTrigger><SelectValue placeholder="Select finished product SKU" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="sku-flwr-bc-3.5g">Flower - Blue Dream 3.5g Jar</SelectItem>
                     <SelectItem value="sku-cart-ogk-1g">Vape Cart - OG Kush 1g</SelectItem>
-                    <SelectItem value="sku-edbl-choc-100mg">Edible - Chocolate Bar 100mg</SelectItem>
+                    <SelectItem value="sku-edbl-choc-100mg">Edible - Chocolate Bar 100mg (10x10mg)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -118,13 +118,13 @@ export default function PackagingPage() {
                     <Input id="units-to-create" type="number" placeholder="e.g., 300" />
                 </div>
                  <div>
-                    <Label htmlFor="metrc-package-tag">METRC Package Tag (Optional)</Label>
+                    <Label htmlFor="metrc-package-tag">METRC Package Tag (Auto-assign available)</Label>
                     <Input id="metrc-package-tag" placeholder="1A40603..." />
                 </div>
               </div>
 
               <div>
-                <Label>Packaging Materials Used</Label>
+                <Label>Packaging Materials Used (Deducted from Inventory)</Label>
                 <div className="p-3 border rounded-md bg-muted/20 space-y-2">
                     <div className="flex gap-2 items-end">
                         <div className="flex-1">
@@ -161,20 +161,18 @@ export default function PackagingPage() {
               {activeRuns.length === 0 && <p className="text-muted-foreground text-center py-4 text-sm">No active packaging runs.</p>}
               {/* Placeholder for list of active runs */}
               <div className="p-3 border rounded-md text-center text-sm text-muted-foreground">
-                  <p>List of active packaging runs will appear here, with options to log progress (units packaged, weight used), assign METRC tags, log rejects/waste, and complete the run.</p>
+                  <p>List of active packaging runs will appear here, with options to log progress (units packaged, weight used), assign METRC tags, log rejects/waste, and complete the run. Completed runs update inventory status to 'Packaged' or 'Ready for Sale'.</p>
               </div>
               <div className="mt-4 p-4 border-dashed border rounded-md">
                 <h4 className="font-semibold text-sm mb-2 flex items-center"><ClipboardList className="mr-2 h-4 w-4 text-primary"/> Post-Packaging Actions</h4>
                 <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1">
-                    <li>Log final batch weight and units created.</li>
-                    <li>Confirm METRC tag association.</li>
-                    <li>Generate and print labels (barcodes, warnings, CoA QR codes).</li>
-                    <li>Update inventory for finished goods.</li>
-                    <li>Create reconciliation report (expected vs actual yield).</li>
+                    <li>Log final batch weight (if applicable) and units created.</li>
+                    <li>Confirm METRC tag association per package/case.</li>
+                    <li>Generate and print compliant labels (barcodes, warnings, CoA QR codes).</li>
+                    <li>Update inventory for finished goods (status: Packaged / Ready for Sale).</li>
+                    <li>Create reconciliation report (expected vs actual yield, material usage).</li>
                 </ul>
               </div>
-
-
             </CardContent>
           </Card>
         </div>
@@ -182,5 +180,3 @@ export default function PackagingPage() {
     </PageContainer>
   );
 }
-
-    

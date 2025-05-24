@@ -32,7 +32,7 @@ export default function MedicalInventoryPage() {
     <PageContainer>
       <PageHeader 
         title="Medical Inventory Management" 
-        description="Manage cannabis products for medical patients. Includes med-only tagging, condition-based eligibility via a suitability matrix, access restrictions, and detailed product suitability data."
+        description="Manage cannabis products specifically for medical patients. Includes med-only tagging, condition-based eligibility filtering via a suitability matrix, access restrictions, and detailed product suitability data (THC/CBD, terpenes, effects)."
       >
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" /> Add Medical Product
@@ -43,11 +43,11 @@ export default function MedicalInventoryPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <CardTitle>Medical Product Stock</CardTitle>
-              <CardDescription>View, edit, or add medical cannabis products. Apply med-only tags, manage condition eligibility using a product-condition matrix, and check prescription compatibility.</CardDescription>
+              <CardDescription>View, edit, or add medical cannabis products. Apply med-only tags, manage condition eligibility using a product-condition matrix, and check prescription compatibility. Product suitability data displayed.</CardDescription>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <Input 
-                placeholder="Search medical products..." 
+                placeholder="Search medical products (name, strain, SKU)..." 
                 className="sm:max-w-xs w-full" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -62,7 +62,7 @@ export default function MedicalInventoryPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                     <div>
                         <Label htmlFor="condition-filter" className="text-sm font-medium">Filter by Patient-Eligible Condition</Label>
-                        <Select disabled>
+                        <Select>
                             <SelectTrigger id="condition-filter" className="mt-1">
                                 <SelectValue placeholder="e.g., PTSD, Chronic Pain" />
                             </SelectTrigger>
@@ -88,7 +88,7 @@ export default function MedicalInventoryPage() {
             <p className="text-base mb-1">Medical Inventory Table Placeholder</p>
             <p className="text-sm">Detailed table will display here, including:</p>
             <ul className="list-disc list-inside text-xs text-left mx-auto max-w-md mt-2">
-                <li>Product Name, Strain, Batch Number, Quantity</li>
+                <li>Product Name, Strain, Batch Number, Quantity, METRC Tag</li>
                 <li className="flex items-center"><Tag className="h-3 w-3 mr-1 text-primary"/>Med-Only Tags & Access Restrictions</li>
                 <li>Patient-Specific Allocations (if applicable)</li>
                 <li><Info className="h-3 w-3 mr-1 text-blue-500"/>Auto-displayed Suitability Data: THC%, CBD%, Terpene Profile, Strain Type, Intended Effects</li>

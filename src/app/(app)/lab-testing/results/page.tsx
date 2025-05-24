@@ -22,8 +22,8 @@ import { Separator } from "@/components/ui/separator";
 
 const completedTests = [
     { id: "TEST-001", requestId: "REQ-001", sourceBatch: "HVT-001", lab: "Anresco Labs", thc: "22.5%", cbd: "0.8%", contaminants: "None Detected", status: "Pass", dateCompleted: "2023-11-02", coaUrl: "#", comments: ""},
-    { id: "TEST-002", requestId: "REQ-000", sourceBatch: "B-042", lab: "Steep Hill", thc: "18.2%", cbd: "1.1%", contaminants: "Pesticide XYZ (0.5ppm > 0.1ppm limit)", status: "Fail", dateCompleted: "2023-10-28", coaUrl: "#", comments: "Batch quarantined."},
-    { id: "TEST-003", requestId: "REQ-000", sourceBatch: "C-105", lab: "SC Labs", thc: "N/A", cbd: "10.2%", contaminants: "None Detected", status: "Pass", dateCompleted: "2023-10-27", coaUrl: "#", comments: "CBD Isolate"},
+    { id: "TEST-002", requestId: "REQ-000", sourceBatch: "B-042", lab: "Steep Hill", thc: "18.2%", cbd: "1.1%", contaminants: "Pesticide XYZ (0.5ppm > 0.1ppm limit)", status: "Fail", dateCompleted: "2023-10-28", coaUrl: "#", comments: "Batch quarantined. Follow-up scheduled."},
+    { id: "TEST-003", requestId: "REQ-000", sourceBatch: "C-105", lab: "SC Labs", thc: "N/A", cbd: "10.2%", contaminants: "None Detected", status: "Pass", dateCompleted: "2023-10-27", coaUrl: "#", comments: "CBD Isolate. CoA attached."},
 ];
 
 export default function LabTestResultsPage() {
@@ -31,7 +31,7 @@ export default function LabTestResultsPage() {
     <PageContainer>
       <PageHeader 
         title="Test Results & COAs" 
-        description="Record, associate, and view lab test results and Certificates of Analysis (COAs). Automatically flags non-compliant batches."
+        description="Record, associate, and view lab test results and Certificates of Analysis (COAs). Automatically flags non-compliant batches and facilitates result review."
       >
         <Button>
           <Download className="mr-2 h-4 w-4" /> Export Results
@@ -42,14 +42,14 @@ export default function LabTestResultsPage() {
         <CardHeader>
             <CardTitle>COA Upload Assistant (AI Enhanced)</CardTitle>
             <CardDescription>
-                Upload a COA (PDF, JPG, CSV) and our AI will attempt to pre-fill key test results like THC/CBD percentages and contaminant levels, speeding up data entry.
+                Upload a COA (PDF, JPG, CSV) and our AI will attempt to pre-fill key test results like THC/CBD percentages and contaminant levels, speeding up data entry. Manually verify before saving.
             </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col sm:flex-row items-center gap-4">
             <Brain className="h-16 w-16 text-primary hidden sm:block" />
             <div className="flex-1 space-y-2">
-                <Input type="file" className="max-w-md" />
-                <p className="text-xs text-muted-foreground">Select the COA file. The system will process it and suggest values for the result entry form below or allow direct creation of a new test result record.</p>
+                <Input type="file" className="max-w-md" accept=".pdf,.jpg,.jpeg,.png,.csv" />
+                <p className="text-xs text-muted-foreground">Select the COA file. The system will process it and suggest values for the result entry form below or allow direct creation of a new test result record. Stored in Firestore.</p>
             </div>
             <Button><Upload className="mr-2 h-4 w-4"/>Process COA &amp; Enter Results</Button>
         </CardContent>
@@ -60,7 +60,7 @@ export default function LabTestResultsPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
                     <CardTitle>All Test Results</CardTitle>
-                    <CardDescription>Filter by batch, status, or test type. Non-compliant results are automatically flagged.</CardDescription>
+                    <CardDescription>Filter by batch, status, or test type. Non-compliant results are automatically flagged. Pass/Fail status clearly indicated.</CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
                     <Input placeholder="Search by Batch ID, Strain, Lab..." className="max-w-xs" />
@@ -98,7 +98,10 @@ export default function LabTestResultsPage() {
                             </TableCell>
                             <TableCell>
                                 <Badge variant={test.status === "Pass" ? "default" : "destructive"} 
-                                       className={test.status === "Pass" ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" : ""}>
+                                       className={cn(
+                                           test.status === "Pass" && "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+                                           test.status === "Fail" && "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                                        )}>
                                     {test.status === "Pass" && <BadgeCheck className="inline h-3 w-3 mr-1"/>}
                                     {test.status === "Fail" && <FileWarning className="inline h-3 w-3 mr-1"/>}
                                     {test.status}
@@ -123,7 +126,7 @@ export default function LabTestResultsPage() {
         </CardContent>
          <CardFooter>
             <p className="text-xs text-muted-foreground">
-                Compliance Alerts: Failed batches automatically notify QA and Administrators. Follow-up actions (Quarantine, Destroy, Retest) can be assigned here.
+                Compliance Alerts: Failed batches automatically notify QA and Administrators. Follow-up actions (Quarantine, Destroy, Retest) can be assigned here. Results are stored in Firestore.
             </p>
         </CardFooter>
       </Card>

@@ -1,30 +1,47 @@
 
 "use client";
 
-import * as React from "react"; // Added React import
+import * as React from "react";
 import { PageContainer } from "@/components/page-container";
-import { PageHeader } from "@/components/page-header";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { ScanBarcode, ShoppingCart, Trash2, UserPlus, Percent, DollarSign, BriefcaseMedical, Users, Filter, Tags } from "lucide-react";
+import { ScanBarcode, ShoppingCart, Trash2, Users, Percent, DollarSign, Filter, Tags, CheckCircle2, AlertTriangle } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
 export default function RetailPOSPage() {
-  // Dummy data
   const cartItems = [
-    { id: 1, name: "Green Crack 3.5g (Batch GC-001)", price: 45.00, quantity: 1, image: "https://placehold.co/64x64.png", dataAiHint: "cannabis flower" },
-    { id: 2, name: "OG Kush Pre-roll (Batch OKP-003)", price: 12.00, quantity: 2, image: "https://placehold.co/64x64.png", dataAiHint: "cannabis preroll" },
+    { id: 1, name: "Green Crack 3.5g (Batch GC-001)", price: 45.00, quantity: 1, image: "https://placehold.co/64x64.png", dataAiHint: "cannabis flower", metrcTag: "1A4060300000E0E000000777" },
+    { id: 2, name: "OG Kush Pre-roll (Batch OKP-003)", price: 12.00, quantity: 2, image: "https://placehold.co/64x64.png", dataAiHint: "cannabis preroll", metrcTag: "1A4060300000E0E000000888" },
   ];
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = subtotal * 0.15; // Example tax
+  const taxRate = 0.15; // Example tax rate
+  const tax = subtotal * taxRate;
   const total = subtotal + tax;
   const [isMedicalMode, setIsMedicalMode] = React.useState(false);
+  const [patientId, setPatientId] = React.useState("");
+  const [patientVerified, setPatientVerified] = React.useState<boolean | null>(null);
+  const [purchaseLimitExceeded, setPurchaseLimitExceeded] = React.useState(false);
+
+
+  const handleVerifyPatient = () => {
+    // Mock verification
+    if (patientId === "PAT123") {
+        setPatientVerified(true);
+        setPurchaseLimitExceeded(false); // Reset for demo
+    } else if (patientId === "PAT456") { // Demo for limit exceeded
+        setPatientVerified(true);
+        setPurchaseLimitExceeded(true);
+    }
+    else {
+        setPatientVerified(false);
+    }
+  };
 
   return (
     <PageContainer className="p-0 md:p-0">
@@ -35,16 +52,21 @@ export default function RetailPOSPage() {
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Retail Point of Sale</h2>
               <p className="text-sm text-muted-foreground">
-                Unified POS with real-time inventory. Toggle for Recreational/Medical sales. METRC integrated.
+                Unified POS with real-time inventory. Toggle for Recreational/Medical sales. METRC integrated for sales & package updates.
               </p>
             </div>
             <div className="flex items-center space-x-2 mt-2 sm:mt-0">
               <Switch
                 id="medical-mode-toggle"
                 checked={isMedicalMode}
-                onCheckedChange={setIsMedicalMode}
+                onCheckedChange={(checked) => {
+                    setIsMedicalMode(checked);
+                    setPatientId("");
+                    setPatientVerified(null);
+                    setPurchaseLimitExceeded(false);
+                }}
               />
-              <Label htmlFor="medical-mode-toggle" className={isMedicalMode ? "text-primary font-semibold" : ""}>
+              <Label htmlFor="medical-mode-toggle" className={cn(isMedicalMode ? "text-primary font-semibold" : "", "cursor-pointer")}>
                 {isMedicalMode ? "Medical Mode Active" : "Recreational Mode"}
               </Label>
             </div>
@@ -52,15 +74,28 @@ export default function RetailPOSPage() {
 
           {isMedicalMode && (
             <Card className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700">
-              <CardDescription className="text-xs text-blue-700 dark:text-blue-300">
+              <p className="text-xs text-blue-700 dark:text-blue-300 mb-2">
                 Medical Mode: Enforces patient ID validation, condition-based product restrictions, purchase limits, and prescription association.
-              </CardDescription>
-              <Input className="mt-2 h-8 text-xs" placeholder="Enter Patient ID for Validation..." />
+              </p>
+              <div className="flex gap-2 items-center">
+                <Input 
+                    className="h-8 text-xs flex-1" 
+                    placeholder="Enter Patient ID for Validation..." 
+                    value={patientId}
+                    onChange={(e) => setPatientId(e.target.value)}
+                />
+                <Button size="sm" className="h-8 text-xs" onClick={handleVerifyPatient}>Verify</Button>
+                 {patientVerified === true && <CheckCircle2 className="h-5 w-5 text-green-500" title="Patient Verified"/>}
+                 {patientVerified === false && <AlertTriangle className="h-5 w-5 text-destructive" title="Patient Not Found/Invalid ID"/>}
+              </div>
+              {purchaseLimitExceeded && (
+                <p className="text-xs text-destructive mt-1 flex items-center"><AlertTriangle className="h-3.5 w-3.5 mr-1"/>Patient has exceeded purchase limits. Sale cannot proceed.</p>
+              )}
             </Card>
           )}
 
           <div className="flex gap-2">
-            <Input placeholder="Scan METRC Tag or Search Products (strain, form, potency...)" className="flex-1" />
+            <Input placeholder="Scan METRC Tag or Search Products (strain, form, potency, condition...)" className="flex-1" />
             <Button variant="outline" size="icon" aria-label="Scan Barcode">
               <ScanBarcode className="h-5 w-5" />
             </Button>
@@ -86,7 +121,7 @@ export default function RetailPOSPage() {
                 </Card>
               ))}
             </div>
-             <p className="text-xs text-muted-foreground mt-4 text-center">Product display includes filters for strain, form, potency, and condition eligibility (in Medical Mode).</p>
+             <p className="text-xs text-muted-foreground mt-4 text-center">Product display includes filters for strain, form, potency, and condition eligibility (in Medical Mode). Batch traceability via METRC tags.</p>
           </ScrollArea>
         </div>
 
@@ -105,9 +140,9 @@ export default function RetailPOSPage() {
               <div key={item.id} className="flex items-center gap-3 py-3 border-b last:border-b-0">
                 <Image src={item.image} alt={item.name} width={48} height={48} className="rounded-md object-cover" data-ai-hint={item.dataAiHint} />
                 <div className="flex-1">
-                  <p className="text-sm font-medium truncate">{item.name}</p>
+                  <p className="text-sm font-medium truncate" title={item.name}>{item.name}</p>
                   <p className="text-xs text-muted-foreground">${item.price.toFixed(2)} x {item.quantity}</p>
-                  <p className="text-xs text-muted-foreground flex items-center"><Tags className="h-3 w-3 mr-1"/>METRC: ...456 (Batch)</p>
+                  <p className="text-xs text-muted-foreground flex items-center"><Tags className="h-3 w-3 mr-1"/>METRC: ...{item.metrcTag.slice(-3)} (Batch)</p>
                 </div>
                 <p className="text-sm font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
                 <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive">
@@ -126,7 +161,7 @@ export default function RetailPOSPage() {
               <span>${subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Tax (Automated)</span>
+              <span>Tax ({ (taxRate * 100).toFixed(0) }%)</span>
               <span>${tax.toFixed(2)}</span>
             </div>
              <div className="flex justify-between items-center">
@@ -138,10 +173,10 @@ export default function RetailPOSPage() {
               <span>${total.toFixed(2)}</span>
             </div>
           </div>
-          <Button size="lg" className="w-full mt-6 text-base py-6">
+          <Button size="lg" className="w-full mt-6 text-base py-6" disabled={isMedicalMode && (!patientVerified || purchaseLimitExceeded)}>
             <DollarSign className="mr-2 h-5 w-5"/> Checkout
           </Button>
-          <p className="text-xs text-muted-foreground mt-2 text-center">Sale completion triggers inventory decrement, METRC push, label printing, and optional receipt.</p>
+          <p className="text-xs text-muted-foreground mt-2 text-center">Sale completion triggers inventory decrement, METRC push, label printing, and optional receipt generation. Purchase limits enforced.</p>
         </div>
       </div>
     </PageContainer>

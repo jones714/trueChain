@@ -27,13 +27,14 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState, useMemo } from "react";
 
-type ProcessingStage = "Drying" | "Curing" | "Trimming" | "Extraction" | "Winterization" | "Distillation" | "Infusion" | "Packaging" | "QA Testing";
-type BatchStatus = "Active" | "Completed" | "Failed QA" | "On Hold" | "Awaiting Transfer";
-type ProductType = "Flower" | "Trim" | "Fresh Frozen" | "Crude Extract" | "Distillate" | "Isolate" | "Edible" | "Tincture" | "Topical";
+type ProcessingStage = "Drying" | "Curing" | "Trimming" | "Extraction" | "Winterization" | "Distillation" | "Infusion" | "Packaging Input" | "Packaged" | "QA Testing";
+type BatchStatus = "Active" | "Completed" | "Failed QA" | "On Hold" | "Awaiting Transfer" | "Awaiting Packaging";
+
+type ProductType = "Flower" | "Trim" | "Fresh Frozen" | "Crude Extract" | "Distillate" | "Isolate" | "Edible Base" | "Tincture Base" | "Topical Base" | "Finished Edible" | "Finished Tincture" | "Finished Topical";
 
 interface ProcessingBatch {
   id: string;
-  harvestSource: string; // e.g., HVT-001
+  harvestSource: string; // e.g., HVT-001 or another PROC-ID
   productType: ProductType;
   weightIn: number; // grams
   weightOut?: number; // grams
@@ -46,13 +47,13 @@ interface ProcessingBatch {
 const initialBatches: ProcessingBatch[] = [
   { id: "PROC-2024-001", harvestSource: "HVT-001", productType: "Flower", weightIn: 5200, currentStage: "Drying", status: "Active", assignedStaff: "Alice W.", lastUpdated: "2023-10-28" },
   { id: "PROC-2024-002", harvestSource: "HVT-002", productType: "Trim", weightIn: 1500, currentStage: "Extraction", status: "Active", assignedStaff: "Bob B.", lastUpdated: "2023-10-29" },
-  { id: "PROC-2024-003", harvestSource: "PROC-2024-002 (Extract)", productType: "Edible", weightIn: 300, currentStage: "Packaging", status: "Completed", weightOut: 2800 , assignedStaff: "Charlie C.", lastUpdated: "2023-10-25" },
+  { id: "PROC-2024-003", harvestSource: "PROC-2024-002 (Extract)", productType: "Edible Base", weightIn: 300, currentStage: "Awaiting Packaging", status: "Awaiting Packaging", weightOut: 280 , assignedStaff: "Charlie C.", lastUpdated: "2023-10-25" }, // Changed stage and status
   { id: "PROC-2024-004", harvestSource: "HVT-003", productType: "Flower", weightIn: 3000, currentStage: "Curing", status: "Failed QA", assignedStaff: "Alice W.", lastUpdated: "2023-10-22" },
+  { id: "PROC-2024-005", harvestSource: "PROC-2024-003 (Edible Base)", productType: "Finished Edible", weightIn: 280, currentStage: "Packaged", status: "Completed", weightOut: 1000 , assignedStaff: "Charlie C.", lastUpdated: "2023-10-26" }, // Example of packaged goods in units
 ];
 
 export default function ProcessingBatchesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  // Add more filters as needed: stageFilter, statusFilter, productTypeFilter
 
   const filteredBatches = useMemo(() => {
     return initialBatches.filter(batch => 
@@ -68,6 +69,7 @@ export default function ProcessingBatchesPage() {
       case "Completed": return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300";
       case "Failed QA": return "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300";
       case "On Hold": return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-400";
+      case "Awaiting Packaging": return "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300";
       default: return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300";
     }
   };
@@ -76,7 +78,7 @@ export default function ProcessingBatchesPage() {
     <PageContainer>
       <PageHeader 
         title="Processing Batches" 
-        description="Manage all processing batches, from raw material input to finished products. Track stages, weights, and staff assignments."
+        description="Manage all processing batches, from raw material input to finished products. Track stages, weights, staff assignments, and link to source harvests/batches. Click 'Create New Batch' to initiate a new processing workflow (e.g., from harvest to drying, or from extract to infusion)."
       >
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" /> Create New Batch
@@ -108,7 +110,7 @@ export default function ProcessingBatchesPage() {
                 <TableHead>Source Material</TableHead>
                 <TableHead>Product Type</TableHead>
                 <TableHead>Weight In (g)</TableHead>
-                <TableHead>Weight Out (g)</TableHead>
+                <TableHead>Weight Out (g/units)</TableHead>
                 <TableHead>Current Stage</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Assigned Staff</TableHead>
@@ -144,8 +146,8 @@ export default function ProcessingBatchesPage() {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem><Eye className="mr-2 h-4 w-4" />View Details & Logs</DropdownMenuItem>
                         <DropdownMenuItem><ArrowRightCircle className="mr-2 h-4 w-4" />Move to Next Stage</DropdownMenuItem>
-                        <DropdownMenuItem><Recycle className="mr-2 h-4 w-4" />Log Waste</DropdownMenuItem>
-                         <DropdownMenuItem><Tag className="mr-2 h-4 w-4" />Assign METRC Tag</DropdownMenuItem>
+                         <DropdownMenuItem><Recycle className="mr-2 h-4 w-4" />Log Waste</DropdownMenuItem>
+                         <DropdownMenuItem><Tag className="mr-2 h-4 w-4" />Assign METRC Tag (Packaging)</DropdownMenuItem>
                         <DropdownMenuItem><Printer className="mr-2 h-4 w-4" />Print Packaging Labels</DropdownMenuItem>
                         <DropdownMenuItem><CookingPot className="mr-2 h-4 w-4" />Assign to Recipe</DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -171,5 +173,3 @@ export default function ProcessingBatchesPage() {
     </PageContainer>
   );
 }
-
-    

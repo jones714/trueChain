@@ -15,19 +15,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle, Trash2, CalendarPlus, Download, UploadCloud, Edit, FileTextIcon, BarChartHorizontalBig, Filter, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { PlusCircle, Trash2, CalendarPlus, Download, UploadCloud, Edit, FileTextIcon, BarChartHorizontalBig, Filter, AlertTriangle, CheckCircle, Clock, CameraIcon, UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 // Dummy data for waste logs
 const wasteLogsData = [
-  { id: "WST001", metrcTag: "1A4060300000E0E000000123", type: "Plant Material", source: "Harvest HVT-005", initialWeight: "5.2 kg", loggedBy: "Alice W.", dateLogged: "2023-10-25", status: "Awaiting Destruction", destructionMethod: "Grinding & Mixing", scheduledDestruction: "2023-11-01", proofAvailable: true },
-  { id: "WST002", metrcTag: "1A4060300000E0E000000124", type: "Expired Product", source: "Batch PRD-072", initialWeight: "0.8 kg", loggedBy: "Bob B.", dateLogged: "2023-10-26", status: "Destruction Overdue", destructionMethod: "Incineration", scheduledDestruction: "2023-10-28", proofAvailable: false },
-  { id: "WST003", metrcTag: "1A4060300000E0E000000125", type: "Chemical Waste", source: "Lab Test LT-015", initialWeight: "0.1 L", loggedBy: "Charlie C.", dateLogged: "2023-10-27", status: "Destroyed", destructionMethod: "Neutralization", scheduledDestruction: "2023-10-27", proofAvailable: true },
+  { id: "WST001", metrcTag: "1A4060300000E0E000000123", type: "Plant Material", source: "Harvest HVT-005", initialWeight: "5.2 kg", finalWeight: "5.15 kg", loggedBy: "Alice W.", dateLogged: "2023-10-25", status: "Awaiting Destruction", destructionMethod: "Grinding & Mixing", scheduledDestruction: "2023-11-01", proofAvailable: true, witness: "Security Guard #1" },
+  { id: "WST002", metrcTag: "1A4060300000E0E000000124", type: "Expired Product", source: "Batch PRD-072", initialWeight: "0.8 kg", finalWeight: "0.78 kg", loggedBy: "Bob B.", dateLogged: "2023-10-26", status: "Destruction Overdue", destructionMethod: "Incineration", scheduledDestruction: "2023-10-28", proofAvailable: false, witness: "Jane D." },
+  { id: "WST003", metrcTag: "1A4060300000E0E000000125", type: "Chemical Waste", source: "Lab Test LT-015", initialWeight: "0.1 L", finalWeight: "0.1 L", loggedBy: "Charlie C.", dateLogged: "2023-10-27", status: "Destroyed", destructionMethod: "Neutralization", scheduledDestruction: "2023-10-27", proofAvailable: true, witness: "Lab Supervisor" },
 ];
 
 const scheduledDestructionsData = [
-  { id: "DEVT001", scheduledDate: "2023-11-01 10:00 AM", location: "Destruction Area A", method: "Grinding & Mixing", totalWeight: "5.2 kg", assignedStaff: "Alice W., Security Guard", status: "Pending" },
+  { id: "DEVT001", scheduledDate: "2023-11-01 10:00 AM", location: "Destruction Area A", method: "Grinding & Mixing", totalWeight: "5.2 kg", assignedStaff: "Alice W., Security Guard #1", status: "Pending" },
   { id: "DEVT002", scheduledDate: "2023-11-05 02:00 PM", location: "Facility B - Incinerator", method: "Incineration", totalWeight: "10.5 kg", assignedStaff: "Bob B., Compliance Officer", status: "Pending" },
 ];
 
@@ -37,7 +37,7 @@ export default function WasteManagementPage() {
     <PageContainer>
       <PageHeader 
         title="Waste Management & METRC Compliance" 
-        description="Track, manage, and report cannabis waste from seed-to-sale, ensuring full regulatory compliance."
+        description="Track, manage, and report cannabis waste (plant, product, chemical) from seed-to-sale. Ensure full regulatory compliance with METRC tag association, destruction method tracking, before/after weights, chain-of-custody (staff, time, location), photo/video proof, and witness logs. Auto-generates destruction logs and supports audit exports."
       >
         <div className="flex flex-wrap gap-2">
           <Button>
@@ -47,7 +47,7 @@ export default function WasteManagementPage() {
             <CalendarPlus className="mr-2 h-4 w-4" /> Schedule Destruction Event
           </Button>
           <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" /> Export Logs
+            <Download className="mr-2 h-4 w-4" /> Export Logs (CSV/PDF)
           </Button>
         </div>
       </PageHeader>
@@ -89,8 +89,8 @@ export default function WasteManagementPage() {
              <BarChartHorizontalBig className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-sm text-muted-foreground">Visualization of waste by type, method, facility.</div>
-             <p className="text-xs text-muted-foreground mt-2">Anomaly detection (e.g. excessive waste per batch) will be highlighted here.</p>
+            <div className="text-sm text-muted-foreground">Visualization of waste by type, method, facility. Anomaly detection (e.g. excessive waste per batch) highlighted.</div>
+             <p className="text-xs text-muted-foreground mt-2">Dashboard will show trends and flag anomalies.</p>
           </CardContent>
         </Card>
       </div>
@@ -108,10 +108,10 @@ export default function WasteManagementPage() {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
                     <CardTitle>Active Waste Log</CardTitle>
-                    <CardDescription>Real-time log of all waste items, with METRC tag association. Mobile logging support for on-site entries.</CardDescription>
+                    <CardDescription>Real-time log of all waste items, with METRC tag association. Mobile logging support for on-site entries. Log includes initial/final weights, destruction method, witness, and photo/video proof.</CardDescription>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
-                    <Input placeholder="Filter by METRC Tag, Type..." className="max-w-xs" />
+                    <Input placeholder="Filter by METRC Tag, Type, Witness..." className="max-w-xs" />
                     <Button variant="outline"><Filter className="mr-2 h-4 w-4"/>Filters</Button>
                 </div>
               </div>
@@ -122,13 +122,11 @@ export default function WasteManagementPage() {
                   <TableRow>
                     <TableHead>METRC Tag</TableHead>
                     <TableHead>Type</TableHead>
-                    <TableHead>Source</TableHead>
-                    <TableHead>Weight</TableHead>
-                    <TableHead>Logged By</TableHead>
+                    <TableHead>Weight (Initial/Final)</TableHead>
+                    <TableHead>Witness</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Dest. Method</TableHead>
-                    <TableHead>Scheduled</TableHead>
+                    <TableHead>Proof</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -137,9 +135,8 @@ export default function WasteManagementPage() {
                     <TableRow key={log.id} className={cn(log.status === "Destruction Overdue" && "bg-destructive/10 hover:bg-destructive/20")}>
                       <TableCell className="font-medium">{log.metrcTag}</TableCell>
                       <TableCell>{log.type}</TableCell>
-                      <TableCell>{log.source}</TableCell>
-                      <TableCell>{log.initialWeight}</TableCell>
-                      <TableCell>{log.loggedBy}</TableCell>
+                      <TableCell>{log.initialWeight} / {log.finalWeight || 'N/A'}</TableCell>
+                      <TableCell><UserCheck className="inline h-3.5 w-3.5 mr-1 text-muted-foreground"/>{log.witness || 'N/A'}</TableCell>
                       <TableCell>{log.dateLogged}</TableCell>
                       <TableCell>
                         <Badge 
@@ -155,13 +152,14 @@ export default function WasteManagementPage() {
                           {log.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>{log.destructionMethod}</TableCell>
-                      <TableCell>{log.scheduledDestruction}</TableCell>
+                      <TableCell>
+                        {log.proofAvailable ? <CameraIcon className="h-5 w-5 text-primary" title="Proof Available"/> : <CameraIcon className="h-5 w-5 text-muted-foreground opacity-50" title="No Proof Uploaded"/>}
+                      </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" title="Upload Proof">
-                          <UploadCloud className={cn("h-4 w-4", log.proofAvailable ? "text-primary" : "text-muted-foreground")} />
+                        <Button variant="ghost" size="icon" title="Upload Proof/Photo/Video">
+                          <UploadCloud className="h-4 w-4"/>
                         </Button>
-                        <Button variant="ghost" size="icon" title="Record Destruction">
+                        <Button variant="ghost" size="icon" title="Record Destruction Details">
                           <Edit className="h-4 w-4" />
                         </Button>
                          <Button variant="ghost" size="icon" title="View Details">
@@ -176,7 +174,7 @@ export default function WasteManagementPage() {
                 <div className="mt-4 p-8 border border-dashed rounded-md text-center text-muted-foreground">
                   <Trash2 className="mx-auto h-12 w-12 text-muted-foreground/50" />
                   <p className="mt-2">No waste records found. Click "Add New Waste Record" to get started.</p>
-                  <p className="text-xs mt-1">Waste is categorized (plant, product, chemical), logged with METRC tags, and tracks destruction method, weight (before/after), chain-of-custody (staff, time, location), and photo/video proof.</p>
+                  <p className="text-xs mt-1">Waste is categorized (plant, product, chemical), logged with METRC tags, and tracks destruction method, weight (before/after), chain-of-custody (staff, time, location), witness, and photo/video proof.</p>
                 </div>
               )}
             </CardContent>
@@ -187,7 +185,7 @@ export default function WasteManagementPage() {
           <Card>
             <CardHeader>
               <CardTitle>Scheduled Destruction Events</CardTitle>
-              <CardDescription>Manage and track upcoming and ongoing waste destruction events. Alerts for approaching deadlines.</CardDescription>
+              <CardDescription>Manage and track upcoming and ongoing waste destruction events. Alerts for approaching deadlines and requires witness logs for completion.</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -198,7 +196,7 @@ export default function WasteManagementPage() {
                     <TableHead>Location</TableHead>
                     <TableHead>Method</TableHead>
                     <TableHead>Total Weight</TableHead>
-                    <TableHead>Assigned Staff</TableHead>
+                    <TableHead>Assigned Staff/Witnesses</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -216,7 +214,7 @@ export default function WasteManagementPage() {
                            <Badge variant={event.status === "Completed" ? "default" : "secondary"}>{event.status}</Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                            <Button variant="outline" size="sm">Start Event</Button>
+                            <Button variant="outline" size="sm">Start Event / Log Details</Button>
                             <Button variant="ghost" size="sm" className="ml-2">View Details</Button>
                         </TableCell>
                      </TableRow>
@@ -242,8 +240,8 @@ export default function WasteManagementPage() {
                 <CardContent className="space-y-4">
                     <div className="p-4 border rounded-lg">
                         <h3 className="font-semibold text-md">Destruction Logs & Audit Trails</h3>
-                        <p className="text-sm text-muted-foreground mt-1">Auto-generate compliant destruction logs. Maintain a full audit trail for all waste activities, including chain-of-custody (staff, time, location).</p>
-                        <Button variant="default" className="mt-3">Generate Destruction Log</Button>
+                        <p className="text-sm text-muted-foreground mt-1">Auto-generate compliant destruction logs. Maintain a full audit trail for all waste activities, including chain-of-custody (staff, time, location, witness, photo/video proof).</p>
+                        <Button variant="default" className="mt-3">Generate Destruction Log (PDF/CSV)</Button>
                         <Button variant="outline" className="mt-3 ml-2">View Full Audit Trail</Button>
                     </div>
                      <div className="p-4 border rounded-lg">
