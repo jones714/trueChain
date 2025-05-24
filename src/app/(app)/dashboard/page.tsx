@@ -90,7 +90,7 @@ const upcomingAppointments = [
 const productSpotlight = {
     name: "Sunset Sherbet Flower",
     salesIncrease: "+15% this week",
-    image: "https://placehold.co/100x80.png",
+    image: "/poo2.webp", // Corrected from placehold.co based on previous interaction
     dataAiHint: "cannabis flower"
 };
 
@@ -232,7 +232,7 @@ export default function DashboardPageV2() {
                 <CardTitle className="flex items-center"><GaugeCircle className="mr-2 h-5 w-5 text-primary" />METRC Status Monitor</CardTitle>
               </CardHeader>
               <CardContent className="text-sm space-y-1">
-                <p>Status: <Badge variant={metrcStatus.status === "Operational" ? "default" : "destructive"} className={cn(metrcStatus.status === "Operational" ? "bg-green-600/20 text-green-700 dark:text-green-300 dark:bg-green-800/30" : "")}>{metrcStatus.status}</Badge></p>
+                <div className="flex items-center">Status: <Badge variant={metrcStatus.status === "Operational" ? "default" : "destructive"} className={cn("ml-1", metrcStatus.status === "Operational" ? "bg-green-600/20 text-green-700 dark:text-green-300 dark:bg-green-800/30" : "")}>{metrcStatus.status}</Badge></div>
                 <p>Last Successful Sync: <span className="font-medium">{metrcStatus.lastSync}</span></p>
                 <p>Errors Flagged: <span className={cn("font-medium", metrcStatus.errors > 0 ? "text-destructive" : "text-green-600")}>{metrcStatus.errors}</span></p>
               </CardContent>
@@ -248,7 +248,7 @@ export default function DashboardPageV2() {
                 {licenseHealthData.map(lic => (
                    <div key={lic.id} className="text-sm mb-1.5 pb-1.5 border-b last:border-b-0">
                        <p className="font-medium">{lic.name}</p>
-                       <p className="text-xs">Expiry: {lic.expiry} - Status:
+                       <div className="text-xs">Expiry: {lic.expiry} - Status:
                            <Badge variant={lic.status === "Active" ? "default" : lic.status === "Expiring Soon" ? "secondary" : "destructive"}
                                   className={cn("ml-1", 
                                    lic.status === "Active" && "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
@@ -257,7 +257,7 @@ export default function DashboardPageV2() {
                                   )}>
                                {lic.status}
                            </Badge>
-                       </p>
+                       </div>
                    </div>
                 ))}
               </CardContent>
