@@ -5,7 +5,7 @@ import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, PlusCircle, Printer, Edit3, Filter, DownloadCloud, Route, Tag, Package, User, TruckIcon, CalendarClock, FileSymlink, Upload } from "lucide-react";
+import { FileText, PlusCircle, Printer, Edit3, Filter, DownloadCloud, Route, Tag, Package, User, TruckIcon, CalendarClock, FileSymlink, Upload, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -30,7 +30,7 @@ export default function ManifestsPage() {
     <PageContainer>
       <PageHeader 
         title="METRC-Compliant Manifests" 
-        description="Create, manage, and track transfer manifests. Integrates with inventory for package selection and auto-pushes to METRC."
+        description="Create, manage, and track transfer manifests. Integrates with inventory for package selection (including METRC tags, quantities, weights), assigns driver & vehicle, sets estimated delivery windows, allows attachments, and auto-pushes to METRC. Output includes printable PDFs with QR codes. Changes are synced with METRC."
       >
         <div className="flex flex-wrap gap-2">
             <Button>
@@ -49,7 +49,7 @@ export default function ManifestsPage() {
             Manifests pull data directly from inventory. Key fields include: Origin/Recipient Licenses & Facilities, 
             Products (Packages with METRC tags, quantities, weights), assigned Driver & Vehicle, estimated delivery window, 
             and optional attachments (photos, documents). Output includes printable PDFs with QR codes for easy scanning. 
-            Changes are synced with METRC.
+            Changes are synced with METRC. Manifest statuses: Draft → Dispatched → In Transit → Delivered → Reconciled.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -92,10 +92,10 @@ export default function ManifestsPage() {
                         <TableCell>
                             <Badge variant={
                                 manifest.status === "Draft" ? "secondary" :
-                                manifest.status === "In Transit" ? "default" : // default might be primary
+                                manifest.status === "In Transit" ? "default" :
                                 manifest.status === "Delivered" ? "outline" : 
-                                manifest.status === "Reconciled" ? "default" : // Use a success variant if available
-                                "destructive" // for rejected/failed
+                                manifest.status === "Reconciled" ? "default" : 
+                                "destructive"
                             }
                             className={cn(
                                 manifest.status === "Draft" && "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
@@ -106,7 +106,7 @@ export default function ManifestsPage() {
                             >{manifest.status}</Badge>
                         </TableCell>
                         <TableCell>
-                            {manifest.metrcPushed ? <MetrcSyncedIcon className="h-5 w-5 text-green-500" title="Synced with METRC"/> : <AlertTriangle className="h-5 w-5 text-orange-500" title="Pending METRC Sync"/>}
+                            {manifest.metrcPushed ? <CheckCircle2 className="h-5 w-5 text-green-500" title="Synced with METRC"/> : <AlertTriangle className="h-5 w-5 text-orange-500" title="Pending METRC Sync"/>}
                         </TableCell>
                         <TableCell className="text-right">
                             <Button variant="ghost" size="icon" title="View Details"><FileText className="h-4 w-4"/></Button>
