@@ -13,6 +13,7 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 export default function RetailPOSPage() {
   const cartItems = [
@@ -52,7 +53,7 @@ export default function RetailPOSPage() {
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Retail Point of Sale</h2>
               <p className="text-sm text-muted-foreground">
-                Unified POS with real-time inventory. Toggle for Recreational/Medical sales. METRC integrated for sales & package updates.
+                Unified POS with real-time inventory. Toggle for Recreational/Medical sales (enforcing patient ID validation, condition-based restrictions, purchase limits, prescription association). METRC integrated for sales & package updates.
               </p>
             </div>
             <div className="flex items-center space-x-2 mt-2 sm:mt-0">
