@@ -23,6 +23,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
   PlusCircle,
   Sprout, 
   Droplets, 
@@ -73,6 +84,7 @@ import { Progress } from "@/components/ui/progress";
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isPast, differenceInDays } from 'date-fns';
+import { useToast } from "@/hooks/use-toast";
 
 type PlantStage = "Germination" | "Vegetative" | "Flowering" | "Harvested" | "Destroyed";
 type QAStatus = "Untested" | "Pass" | "Fail";
@@ -81,21 +93,21 @@ type MetrcSyncStatus = "synced" | "error" | "pending";
 
 interface PlantBatch {
   id: string;
-  metrcTagId: string; // This can represent RFID or other compliance tags
+  metrcTagId: string; 
   strain: string;
   quantity: number;
   currentPhase: PlantStage;
   roomLocation: string;
-  phaseStartDate: string; // ISO Date string
-  estimatedStageCompletionDate: string; // ISO Date string
+  phaseStartDate: string; 
+  estimatedStageCompletionDate: string; 
   qaStatus: QAStatus;
   hasNotes: boolean;
   onTrackStatus: OnTrackStatus;
-  status: "Active" | "Transferred" | "Destroyed" | "On Hold" | "Harvested"; // Overall batch status
+  status: "Active" | "Transferred" | "Destroyed" | "On Hold" | "Harvested"; 
   metrcSync: MetrcSyncStatus;
-  stageProgress: number; // Percentage
-  expectedHarvestDate: string; // ISO Date string
-  dateCreated: string; // ISO Date string for initial creation
+  stageProgress: number; 
+  expectedHarvestDate: string; 
+  dateCreated: string; 
 }
 
 const initialPlantBatches: PlantBatch[] = [
@@ -161,8 +173,8 @@ const initialPlantBatches: PlantBatch[] = [
     quantity: 45,
     roomLocation: "Drying Room 1",
     dateCreated: "2023-08-01",
-    phaseStartDate: "2023-10-05", // Date of harvest
-    estimatedStageCompletionDate: "2023-10-10", // End of drying/curing
+    phaseStartDate: "2023-10-05", 
+    estimatedStageCompletionDate: "2023-10-10", 
     expectedHarvestDate: "2023-10-05",
     status: "Harvested",
     metrcSync: "synced",
@@ -180,9 +192,9 @@ const initialPlantBatches: PlantBatch[] = [
     roomLocation: "Flower Room 2A",
     dateCreated: "2023-07-15",
     phaseStartDate: "2023-09-01",
-    estimatedStageCompletionDate: "2023-10-20", // This date is in the past
-    expectedHarvestDate: "2023-10-20", // This date is in the past
-    status: "Active", // Still active but harvest overdue
+    estimatedStageCompletionDate: "2023-10-20", 
+    expectedHarvestDate: "2023-10-20", 
+    status: "Active", 
     metrcSync: "synced",
     stageProgress: 95,
     qaStatus: "Untested",
@@ -213,12 +225,27 @@ const onTrackStatusColors: Record<OnTrackStatus, string> = {
 
 
 export default function PlantsLifecycleDashboardPage() {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [stageFilter, setStageFilter] = useState('all_stages');
   const [strainFilter, setStrainFilter] = useState('all_strains');
   const [locationFilter, setLocationFilter] = useState('all_locations');
   const [qaStatusFilter, setQaStatusFilter] = useState('all_qa');
-  const [activeFilter, setActiveFilter] = useState('all_activity'); // 'active', 'harvested', 'all_activity'
+  const [activeFilter, setActiveFilter] = useState('all_activity');
+
+  const [showCreateBatchModal, setShowCreateBatchModal] = useState(false);
+  const [showAdvanceStageModal, setShowAdvanceStageModal] = useState(false);
+  const [showLogActivityModal, setShowLogActivityModal] = useState(false);
+  const [showLogNutrientModal, setShowLogNutrientModal] = useState(false);
+  const [showFlagHealthModal, setShowFlagHealthModal] = useState(false);
+  const [showUploadQAModal, setShowUploadQAModal] = useState(false);
+  const [showHarvestModal, setShowHarvestModal] = useState(false);
+  const [showCloneModal, setShowCloneModal] = useState(false);
+  const [showMoveModal, setShowMoveModal] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [showDestroyModal, setShowDestroyModal] = useState(false);
+  const [selectedBatch, setSelectedBatch] = useState<PlantBatch | null>(null);
+
 
   const uniqueStrains = useMemo(() => Array.from(new Set(initialPlantBatches.map(b => b.strain))), []);
   const uniqueLocations = useMemo(() => Array.from(new Set(initialPlantBatches.map(b => b.roomLocation))), []);
@@ -254,13 +281,62 @@ export default function PlantsLifecycleDashboardPage() {
     return batch.currentPhase !== 'Harvested' && batch.currentPhase !== 'Destroyed' && isPast(parseISO(batch.expectedHarvestDate));
   };
 
+  const handleCreateBatch = () => {
+    // TODO: Call createPlantBatch(data)
+    console.log("Creating batch...");
+    toast({ title: "Success", description: "Plant batch created successfully." });
+    setShowCreateBatchModal(false);
+  };
+
+  const handleRowAction = (action: string, batch: PlantBatch) => {
+    setSelectedBatch(batch);
+    if (action === "advanceStage") setShowAdvanceStageModal(true);
+    else if (action === "logActivity") setShowLogActivityModal(true);
+    else if (action === "logNutrient") setShowLogNutrientModal(true);
+    else if (action === "flagHealth") setShowFlagHealthModal(true);
+    else if (action === "uploadQA") setShowUploadQAModal(true);
+    else if (action === "harvest") setShowHarvestModal(true);
+    else if (action === "clone") setShowCloneModal(true);
+    else if (action === "move") setShowMoveModal(true);
+    else if (action === "archive") setShowArchiveModal(true);
+    else if (action === "destroy") setShowDestroyModal(true);
+    else if (action === "printTags") {
+         toast({ title: "Action", description: `Printing tags for Batch ID: ${batch.id}` });
+    }
+  };
+  
+  const handleSubmitModal = (modalType: string) => {
+    // Conceptual backend calls
+    if (modalType === "advanceStage") {
+      // TODO: Call updatePlantBatchStage(selectedBatch.id, newStage)
+      toast({ title: "Success", description: `Batch ${selectedBatch?.id} stage advanced.` });
+      setShowAdvanceStageModal(false);
+    } else if (modalType === "logActivity") {
+      toast({ title: "Success", description: `Activity logged for Batch ${selectedBatch?.id}.` });
+      setShowLogActivityModal(false);
+    } else if (modalType === "harvest") {
+      // TODO: Call harvestPlantBatch(selectedBatch.id, data)
+      toast({ title: "Success", description: `Batch ${selectedBatch?.id} harvested.` });
+      setShowHarvestModal(false);
+    } else if (modalType === "destroy") {
+      // TODO: Call destroyPlantBatch(selectedBatch.id, reason)
+      toast({ title: "Success", description: `Batch ${selectedBatch?.id} marked for destruction.` });
+      setShowDestroyModal(false);
+    } else if (modalType === "archive") {
+      toast({ title: "Success", description: `Batch ${selectedBatch?.id} archived.` });
+      setShowArchiveModal(false);
+    }
+     // Add other modal submit handlers here
+    setSelectedBatch(null);
+  };
+
 
   return (
     <PageContainer>
       <PageHeader
         title="Plant Lifecycle Dashboard"
         description="Monitor, log, and manage all cannabis plant batches from seed to post-harvest. Click 'Create Plant Batch' to start a new batch (select strain, quantity/batch size, origin batch if clones, room/location, starting stage, start date, and notes; option for 'Sample Batch' to exclude from METRC, and to print METRC/RFID tags or QR codes).">
-        <Button>
+        <Button onClick={() => setShowCreateBatchModal(true)}>
           <PlusCircle className="mr-2 h-4 w-4" /> Create Plant Batch
         </Button>
       </PageHeader>
@@ -408,21 +484,21 @@ export default function PlantsLifecycleDashboardPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem><Eye className="mr-2 h-4 w-4" />View Details / Logs</DropdownMenuItem>
-                        <DropdownMenuItem><Sprout className="mr-2 h-4 w-4" />Advance Stage</DropdownMenuItem>
-                        <DropdownMenuItem><FileEdit className="mr-2 h-4 w-4" />Log Activity/Observation</DropdownMenuItem>
-                        <DropdownMenuItem><Wrench className="mr-2 h-4 w-4" />Log Nutrients/Watering</DropdownMenuItem>
-                        <DropdownMenuItem><Bug className="mr-2 h-4 w-4" />Flag Health Concern</DropdownMenuItem>
-                        <DropdownMenuItem><UploadCloud className="mr-2 h-4 w-4" />Upload Lab QA Results</DropdownMenuItem>
-                        <DropdownMenuItem><ClipboardList className="mr-2 h-4 w-4" />Log Harvest & Yield</DropdownMenuItem>
+                        <DropdownMenuLabel>Actions for {batch.id}</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => handleRowAction("viewDetails", batch)}><Eye className="mr-2 h-4 w-4" />View Details / Logs</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("advanceStage", batch)}><Sprout className="mr-2 h-4 w-4" />Advance Stage</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("logActivity", batch)}><FileEdit className="mr-2 h-4 w-4" />Log Activity/Observation</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("logNutrient", batch)}><Wrench className="mr-2 h-4 w-4" />Log Nutrients/Watering</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("flagHealth", batch)}><Bug className="mr-2 h-4 w-4" />Flag Health Concern</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("uploadQA", batch)}><UploadCloud className="mr-2 h-4 w-4" />Upload Lab QA Results</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("harvest", batch)}><ClipboardList className="mr-2 h-4 w-4" />Log Harvest & Yield</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem><GitFork className="mr-2 h-4 w-4" />Clone Batch</DropdownMenuItem>
-                        <DropdownMenuItem><Move className="mr-2 h-4 w-4" />Move Plants</DropdownMenuItem>
-                        <DropdownMenuItem><Printer className="mr-2 h-4 w-4" />Print Tags</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("clone", batch)}><GitFork className="mr-2 h-4 w-4" />Clone Batch</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("move", batch)}><Move className="mr-2 h-4 w-4" />Move Plants</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("printTags", batch)}><Printer className="mr-2 h-4 w-4" />Print Tags</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem><Archive className="mr-2 h-4 w-4" />Archive Batch</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive hover:!text-destructive focus:!text-destructive focus:!bg-destructive/10">
+                        <DropdownMenuItem onClick={() => handleRowAction("archive", batch)}><Archive className="mr-2 h-4 w-4" />Archive Batch</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive hover:!text-destructive focus:!text-destructive focus:!bg-destructive/10" onClick={() => handleRowAction("destroy", batch)}>
                           <Trash2 className="mr-2 h-4 w-4" />Destroy Batch
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -478,6 +554,159 @@ export default function PlantsLifecycleDashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Create Plant Batch Modal */}
+      <Dialog open={showCreateBatchModal} onOpenChange={setShowCreateBatchModal}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Create New Plant Batch</DialogTitle>
+            <DialogDescription>Enter details for the new plant batch. Batch ID will be auto-generated. METRC/RFID tags can be printed after creation.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {/* Basic form fields, actual implementation would use react-hook-form or similar */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="strain" className="text-right">Strain</Label>
+              <Input id="strain" placeholder="e.g., Blue Dream" className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="quantity" className="text-right">Quantity</Label>
+              <Input id="quantity" type="number" placeholder="e.g., 100" className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="origin" className="text-right">Origin</Label>
+              <Input id="origin" placeholder="e.g., Seeds, Clones from PBX-00Y" className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="location" className="text-right">Room/Location</Label>
+              <Input id="location" placeholder="e.g., Propagation Area 1" className="col-span-3" />
+            </div>
+             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="start-stage" className="text-right">Starting Stage</Label>
+                <Select>
+                    <SelectTrigger className="col-span-3"><SelectValue placeholder="Select starting stage..." /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Germination">Germination</SelectItem>
+                        <SelectItem value="Vegetative">Vegetative</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="start-date" className="text-right">Start Date</Label>
+                <Input id="start-date" type="date" className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="notes-create" className="text-right">Notes</Label>
+              <Textarea id="notes-create" placeholder="Optional notes for this batch..." className="col-span-3" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreateBatchModal(false)}>Cancel</Button>
+            <Button onClick={handleCreateBatch}>Create Batch</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Advance Stage Modal */}
+      <Dialog open={showAdvanceStageModal} onOpenChange={setShowAdvanceStageModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Advance Stage for Batch {selectedBatch?.id}</DialogTitle>
+            <DialogDescription>Current Stage: {selectedBatch?.currentPhase}</DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="new-stage">New Stage</Label>
+            <Select>
+                <SelectTrigger id="new-stage"><SelectValue placeholder="Select new stage..." /></SelectTrigger>
+                <SelectContent>
+                    {selectedBatch?.currentPhase === "Germination" && <SelectItem value="Vegetative">Vegetative</SelectItem>}
+                    {selectedBatch?.currentPhase === "Vegetative" && <SelectItem value="Flowering">Flowering</SelectItem>}
+                    {selectedBatch?.currentPhase === "Flowering" && <SelectItem value="Harvested">Harvested (Log Yield)</SelectItem>}
+                </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAdvanceStageModal(false)}>Cancel</Button>
+            <Button onClick={() => handleSubmitModal("advanceStage")}>Advance Stage</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+       {/* Log Harvest Modal */}
+      <Dialog open={showHarvestModal} onOpenChange={setShowHarvestModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Log Harvest for Batch {selectedBatch?.id}</DialogTitle>
+            <DialogDescription>Record yield and other harvest details.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="harvest-date" className="text-right">Harvest Date</Label>
+              <Input id="harvest-date" type="date" defaultValue={new Date().toISOString().split('T')[0]} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="wet-weight" className="text-right">Wet Weight (g)</Label>
+              <Input id="wet-weight" type="number" placeholder="e.g., 2500" className="col-span-3" />
+            </div>
+             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="dry-weight" className="text-right">Dry Weight (g)</Label>
+              <Input id="dry-weight" type="number" placeholder="e.g., 500 (if known)" className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="harvest-notes" className="text-right">Notes</Label>
+              <Textarea id="harvest-notes" placeholder="Optional harvest notes..." className="col-span-3" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowHarvestModal(false)}>Cancel</Button>
+            <Button onClick={() => handleSubmitModal("harvest")}>Log Harvest</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Destroy Batch Modal */}
+      <Dialog open={showDestroyModal} onOpenChange={setShowDestroyModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Destroy Batch {selectedBatch?.id}</DialogTitle>
+            <DialogDescription>This action is irreversible and will be logged.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="destroy-reason">Reason for Destruction</Label>
+            <Textarea id="destroy-reason" placeholder="Enter reason..." />
+             <Label htmlFor="destroy-witness" className="mt-2">Witness Name</Label>
+            <Input id="destroy-witness" placeholder="Enter witness name" />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDestroyModal(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={() => handleSubmitModal("destroy")}>Confirm Destruction</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+       {/* Archive Batch Modal */}
+      <Dialog open={showArchiveModal} onOpenChange={setShowArchiveModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Archive Batch {selectedBatch?.id}?</DialogTitle>
+            <DialogDescription>Archived batches will be hidden from active lists but can be retrieved from historical records.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowArchiveModal(false)}>Cancel</Button>
+            <Button onClick={() => handleSubmitModal("archive")}>Archive Batch</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Placeholder Modals for other actions */}
+      <Dialog open={showLogActivityModal} onOpenChange={setShowLogActivityModal}><DialogContent><DialogHeader><DialogTitle>Log Activity for {selectedBatch?.id}</DialogTitle></DialogHeader><Textarea placeholder="Activity details..."/><DialogFooter><Button variant="outline" onClick={()=>setShowLogActivityModal(false)}>Cancel</Button><Button onClick={()=>handleSubmitModal("logActivity")}>Save Log</Button></DialogFooter></DialogContent></Dialog>
+      <Dialog open={showLogNutrientModal} onOpenChange={setShowLogNutrientModal}><DialogContent><DialogHeader><DialogTitle>Log Nutrients/Watering for {selectedBatch?.id}</DialogTitle></DialogHeader><Textarea placeholder="Nutrient/Watering details..."/><DialogFooter><Button variant="outline" onClick={()=>setShowLogNutrientModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Logged"}); setShowLogNutrientModal(false);}}>Save</Button></DialogFooter></DialogContent></Dialog>
+      <Dialog open={showFlagHealthModal} onOpenChange={setShowFlagHealthModal}><DialogContent><DialogHeader><DialogTitle>Flag Health Concern for {selectedBatch?.id}</DialogTitle></DialogHeader><Textarea placeholder="Health concern details..."/><DialogFooter><Button variant="outline" onClick={()=>setShowFlagHealthModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Flagged"}); setShowFlagHealthModal(false);}}>Flag</Button></DialogFooter></DialogContent></Dialog>
+      <Dialog open={showUploadQAModal} onOpenChange={setShowUploadQAModal}><DialogContent><DialogHeader><DialogTitle>Upload Lab QA Results for {selectedBatch?.id}</DialogTitle></DialogHeader><Input type="file"/><DialogFooter><Button variant="outline" onClick={()=>setShowUploadQAModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Uploaded"}); setShowUploadQAModal(false);}}>Upload</Button></DialogFooter></DialogContent></Dialog>
+      <Dialog open={showCloneModal} onOpenChange={setShowCloneModal}><DialogContent><DialogHeader><DialogTitle>Clone Batch {selectedBatch?.id}</DialogTitle></DialogHeader><Input placeholder="New Batch Name/ID Prefix"/><DialogFooter><Button variant="outline" onClick={()=>setShowCloneModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Cloned"}); setShowCloneModal(false);}}>Clone</Button></DialogFooter></DialogContent></Dialog>
+      <Dialog open={showMoveModal} onOpenChange={setShowMoveModal}><DialogContent><DialogHeader><DialogTitle>Move Plants for Batch {selectedBatch?.id}</DialogTitle></DialogHeader><Input placeholder="New Location"/><DialogFooter><Button variant="outline" onClick={()=>setShowMoveModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Moved"}); setShowMoveModal(false);}}>Move</Button></DialogFooter></DialogContent></Dialog>
+
+
     </PageContainer>
   );
 }
+    

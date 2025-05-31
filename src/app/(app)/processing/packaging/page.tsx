@@ -9,34 +9,48 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { PackagePlus, ScanBarcode, Printer, Tag, Users, Scale, Trash2, PlusCircle, Archive, ClipboardList } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { useSearchParams } from 'next/navigation';
+
 
 interface ReadyToPackItem {
-  id: string; // Source batch ID (e.g., CUR-001, EXT-005, PROC-2024-003)
+  id: string; 
   type: "Cured Flower" | "Trim" | "Extract" | "Infused Product Base";
   strainOrProductName: string;
-  availableWeightOrUnits: number; // grams or base units
+  availableWeightOrUnits: number; 
   unitType: "g" | "units";
 }
 
 interface PackagingRun {
   id: string;
   sourceMaterialId: string;
-  productSku: string; // e.g., SKU-FLWR-BC-3.5G
+  productSku: string; 
   packagingMaterialsUsed: { name: string; quantity: number }[];
   unitsCreated: number;
-  finalBatchWeight?: number; // grams (optional, relevant for bulk flower)
+  finalBatchWeight?: number; 
   metrcPackageTag?: string;
   staff: string;
-  rejectsWaste: number; // grams or units
+  rejectsWaste: number; 
   dateStarted: string;
   dateCompleted?: string;
   status: "Active" | "Completed" | "On Hold";
 }
 
 export default function PackagingPage() {
+  const { toast } = useToast();
+  const searchParams = useSearchParams();
+
   const [readyItems, setReadyItems] = useState<ReadyToPackItem[]>([
     { id: "CUR-001", type: "Cured Flower", strainOrProductName: "Blue Dream", availableWeightOrUnits: 1100, unitType: "g" },
     { id: "EXT-005", type: "Extract", strainOrProductName: "OG Kush Distillate", availableWeightOrUnits: 250, unitType: "g" },
@@ -44,6 +58,32 @@ export default function PackagingPage() {
   ]);
 
   const [activeRuns, setActiveRuns] = useState<PackagingRun[]>([]);
+  const [showStartPackagingRunModal, setShowStartPackagingRunModal] = useState(false);
+  const [selectedSourceMaterial, setSelectedSourceMaterial] = useState<ReadyToPackItem | null>(null);
+
+  useEffect(() => {
+    if (searchParams?.get('action') === 'start_packaging_run') {
+      setShowStartPackagingRunModal(true);
+    }
+  }, [searchParams]);
+  
+  const handleStartPackagingForItem = (item: ReadyToPackItem) => {
+    setSelectedSourceMaterial(item);
+    setShowStartPackagingRunModal(true);
+  };
+
+  const handleInitiatePackagingRun = () => {
+    // TODO: Call startPackagingRun(data)
+    toast({ title: "Success", description: "Packaging run initiated."});
+    setShowStartPackagingRunModal(false);
+    setSelectedSourceMaterial(null);
+  };
+  
+  const handlePrintLabels = () => {
+    // TODO: Logic to select labels and trigger printing
+    toast({ title: "Info", description: "Label printing process would start here." });
+  };
+
 
   return (
     <PageContainer>
@@ -52,8 +92,8 @@ export default function PackagingPage() {
         description="Manage packaging of processed and manufactured products, assign METRC tags, and generate compliant labels. Track material usage, yields, and mark packages as 'ready' for inventory/transfer."
       >
         <div className="flex flex-wrap gap-2">
-          <Button><PlusCircle className="mr-2 h-4 w-4" /> Start New Packaging Run</Button>
-          <Button variant="outline"><Printer className="mr-2 h-4 w-4" /> Print Labels</Button>
+          <Button onClick={() => { setSelectedSourceMaterial(null); setShowStartPackagingRunModal(true); }}><PlusCircle className="mr-2 h-4 w-4" /> Start New Packaging Run</Button>
+          <Button variant="outline" onClick={handlePrintLabels}><Printer className="mr-2 h-4 w-4" /> Print Labels</Button>
         </div>
       </PageHeader>
 
@@ -71,7 +111,7 @@ export default function PackagingPage() {
                             <Card key={item.id} className="p-3 bg-muted/30">
                                 <h4 className="font-semibold">{item.strainOrProductName} ({item.type})</h4>
                                 <p className="text-xs text-muted-foreground">ID: {item.id} | Available: {item.availableWeightOrUnits}{item.unitType}</p>
-                                <Button size="sm" className="w-full mt-2">Start Packaging</Button>
+                                <Button size="sm" className="w-full mt-2" onClick={() => handleStartPackagingForItem(item)}>Start Packaging</Button>
                             </Card>
                         ))}
                     </div>
@@ -91,15 +131,56 @@ export default function PackagingPage() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Start/Manage Packaging Run</CardTitle>
-              <CardDescription>Define parameters for a new packaging run or manage an active one. Finalized packages are marked 'ready' for sale/transfer.</CardDescription>
+              <CardTitle>Active Packaging Runs</CardTitle>
+              <CardDescription>Manage ongoing packaging activities. Finalized packages are marked 'ready' for sale/transfer.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* This would be a more complex form, simplified here */}
+              {activeRuns.length === 0 && 
+                <div className="p-3 border rounded-md text-center text-sm text-muted-foreground">
+                  <p className="mb-2">No active packaging runs.</p>
+                  <p className="text-xs">Start a new run by clicking "Start New Packaging Run" or selecting a material from the left.</p>
+                </div>
+              }
+              {/* Placeholder for list of active runs */}
+              {activeRuns.map(run => (
+                <Card key={run.id} className="p-3">
+                    <CardTitle className="text-md">Run ID: {run.id}</CardTitle>
+                    <CardDescription>Source: {run.sourceMaterialId} | SKU: {run.productSku} | Status: {run.status}</CardDescription>
+                    {/* Add more run details and actions here */}
+                </Card>
+              ))}
+              
+              <Separator className="my-6"/>
+
+              <div className="mt-4 p-4 border-dashed border rounded-md">
+                <h4 className="font-semibold text-sm mb-2 flex items-center"><ClipboardList className="mr-2 h-4 w-4 text-primary"/> Post-Packaging Actions</h4>
+                <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1">
+                    <li>Log final batch weight (if applicable) and units created.</li>
+                    <li>Confirm METRC tag association per package/case.</li>
+                    <li>Generate and print compliant labels (barcodes, warnings, CoA QR codes).</li>
+                    <li>Update inventory for finished goods (status: Packaged / Ready for Sale).</li>
+                    <li>Create reconciliation report (expected vs actual yield, material usage).</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Start New Packaging Run Modal */}
+      <Dialog open={showStartPackagingRunModal} onOpenChange={(isOpen) => { setShowStartPackagingRunModal(isOpen); if (!isOpen) setSelectedSourceMaterial(null); }}>
+        <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+                <DialogTitle>Start New Packaging Run</DialogTitle>
+                <DialogDescription>Define parameters for the packaging run.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
               <div>
                 <Label htmlFor="source-material">Source Material ID</Label>
-                <Input id="source-material" placeholder="e.g., CUR-001 or PROC-2024-003" />
+                <Input id="source-material" defaultValue={selectedSourceMaterial?.id || ""} placeholder="e.g., CUR-001 or PROC-2024-003" />
               </div>
+              {selectedSourceMaterial && <p className="text-xs text-muted-foreground">Selected: {selectedSourceMaterial.strainOrProductName} ({selectedSourceMaterial.type}) - Available: {selectedSourceMaterial.availableWeightOrUnits}{selectedSourceMaterial.unitType}</p>}
+              
               <div>
                 <Label htmlFor="product-sku">Product SKU / Name (Finished Good)</Label>
                 <Select>
@@ -152,31 +233,14 @@ export default function PackagingPage() {
                 <Label htmlFor="assigned-staff-pkg">Assigned Staff</Label>
                 <Input id="assigned-staff-pkg" placeholder="Staff names" />
               </div>
-              
-              <Button className="w-full"><Archive className="mr-2 h-4 w-4"/>Initiate Packaging Run</Button>
-              
-              <Separator className="my-6"/>
+            </div>
+            <DialogFooter>
+                <Button variant="outline" onClick={() => { setShowStartPackagingRunModal(false); setSelectedSourceMaterial(null); }}>Cancel</Button>
+                <Button onClick={handleInitiatePackagingRun}><Archive className="mr-2 h-4 w-4"/>Initiate Packaging Run</Button>
+            </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-              <h3 className="text-md font-semibold">Active Packaging Runs</h3>
-              {activeRuns.length === 0 && <p className="text-muted-foreground text-center py-4 text-sm">No active packaging runs.</p>}
-              {/* Placeholder for list of active runs */}
-              <div className="p-3 border rounded-md text-center text-sm text-muted-foreground">
-                  <p>List of active packaging runs will appear here, with options to log progress (units packaged, weight used), assign METRC tags, log rejects/waste, and complete the run. Completed runs update inventory status to 'Packaged' or 'Ready for Sale'.</p>
-              </div>
-              <div className="mt-4 p-4 border-dashed border rounded-md">
-                <h4 className="font-semibold text-sm mb-2 flex items-center"><ClipboardList className="mr-2 h-4 w-4 text-primary"/> Post-Packaging Actions</h4>
-                <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1">
-                    <li>Log final batch weight (if applicable) and units created.</li>
-                    <li>Confirm METRC tag association per package/case.</li>
-                    <li>Generate and print compliant labels (barcodes, warnings, CoA QR codes).</li>
-                    <li>Update inventory for finished goods (status: Packaged / Ready for Sale).</li>
-                    <li>Create reconciliation report (expected vs actual yield, material usage).</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
     </PageContainer>
   );
 }

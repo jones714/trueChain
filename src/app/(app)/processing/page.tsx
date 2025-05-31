@@ -30,7 +30,7 @@ export default function ProcessingOverviewPage() {
       >
         <div className="flex flex-wrap gap-2">
           <Button asChild>
-            <Link href="/processing/batches?action=create">
+            <Link href="/processing/batches?action=create_batch">
               <PlusCircle className="mr-2 h-4 w-4" /> Create Processing Batch
             </Link>
           </Button>
@@ -40,7 +40,7 @@ export default function ProcessingOverviewPage() {
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="/processing/packaging?action=start_packaging">
+            <Link href="/processing/packaging?action=start_packaging_run">
                <Archive className="mr-2 h-4 w-4" /> Start Packaging Run
             </Link>
           </Button>

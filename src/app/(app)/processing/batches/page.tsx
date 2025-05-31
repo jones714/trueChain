@@ -22,10 +22,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { PlusCircle, Archive, Filter, MoreHorizontal, Eye, ArrowRightCircle, Recycle, Printer, CookingPot, ChevronDown, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useSearchParams } from 'next/navigation';
+
 
 type ProcessingStage = "Drying" | "Curing" | "Trimming" | "Extraction" | "Winterization" | "Distillation" | "Infusion" | "Packaging Input" | "Packaged" | "QA Testing";
 type BatchStatus = "Active" | "Completed" | "Failed QA" | "On Hold" | "Awaiting Transfer" | "Awaiting Packaging";
@@ -53,7 +67,23 @@ const initialBatches: ProcessingBatch[] = [
 ];
 
 export default function ProcessingBatchesPage() {
+  const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedBatch, setSelectedBatch] = useState<ProcessingBatch | null>(null);
+
+  const [showCreateBatchModal, setShowCreateBatchModal] = useState(false);
+  const [showAdvanceStageModal, setShowAdvanceStageModal] = useState(false);
+  const [showLogWasteModal, setShowLogWasteModal] = useState(false);
+  const [showAssignMetrcModal, setShowAssignMetrcModal] = useState(false);
+  const [showAssignRecipeModal, setShowAssignRecipeModal] = useState(false);
+  
+
+  useEffect(() => {
+    if (searchParams?.get('action') === 'create_batch') {
+      setShowCreateBatchModal(true);
+    }
+  }, [searchParams]);
 
   const filteredBatches = useMemo(() => {
     return initialBatches.filter(batch => 
@@ -74,13 +104,49 @@ export default function ProcessingBatchesPage() {
     }
   };
 
+  const handleCreateBatch = () => {
+    // TODO: Call createProcessingBatch(data)
+    toast({ title: "Success", description: "New processing batch created." });
+    setShowCreateBatchModal(false);
+  };
+
+  const handleRowAction = (action: string, batch: ProcessingBatch) => {
+    setSelectedBatch(batch);
+    if (action === "advanceStage") setShowAdvanceStageModal(true);
+    else if (action === "logWaste") setShowLogWasteModal(true);
+    else if (action === "assignMetrc") setShowAssignMetrcModal(true);
+    else if (action === "assignRecipe") setShowAssignRecipeModal(true);
+    else if (action === "printLabels") toast({ title: "Action", description: `Printing labels for Batch ID: ${batch.id}` });
+
+  };
+
+  const handleSubmitModal = (modalType: string) => {
+    if (modalType === "advanceStage") {
+      // TODO: Call advanceProcessingStage(selectedBatch.id, nextStage)
+      toast({ title: "Success", description: `Batch ${selectedBatch?.id} stage advanced.` });
+      setShowAdvanceStageModal(false);
+    } else if (modalType === "logWaste") {
+      // TODO: Call logProcessingWaste(selectedBatch.id, wasteData)
+      toast({ title: "Success", description: `Waste logged for Batch ${selectedBatch?.id}.` });
+      setShowLogWasteModal(false);
+    } else if (modalType === "assignMetrc") {
+       toast({ title: "Success", description: `METRC tag assigned for Batch ${selectedBatch?.id}.` });
+       setShowAssignMetrcModal(false);
+    } else if (modalType === "assignRecipe") {
+       toast({ title: "Success", description: `Recipe assigned to Batch ${selectedBatch?.id}.` });
+       setShowAssignRecipeModal(false);
+    }
+    setSelectedBatch(null);
+  };
+
+
   return (
     <PageContainer>
       <PageHeader 
         title="Processing Batches" 
         description="Manage all processing batches, from raw material input to finished products. Track stages, weights, staff assignments, and link to source harvests/batches. Click 'Create New Batch' to initiate a new processing workflow (e.g., from harvest to drying, or from extract to infusion)."
       >
-        <Button>
+        <Button onClick={() => setShowCreateBatchModal(true)}>
           <PlusCircle className="mr-2 h-4 w-4" /> Create New Batch
         </Button>
       </PageHeader>
@@ -143,15 +209,15 @@ export default function ProcessingBatchesPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem><Eye className="mr-2 h-4 w-4" />View Details & Logs</DropdownMenuItem>
-                        <DropdownMenuItem><ArrowRightCircle className="mr-2 h-4 w-4" />Move to Next Stage</DropdownMenuItem>
-                         <DropdownMenuItem><Recycle className="mr-2 h-4 w-4" />Log Waste</DropdownMenuItem>
-                         <DropdownMenuItem><Tag className="mr-2 h-4 w-4" />Assign METRC Tag (Packaging)</DropdownMenuItem>
-                        <DropdownMenuItem><Printer className="mr-2 h-4 w-4" />Print Packaging Labels</DropdownMenuItem>
-                        <DropdownMenuItem><CookingPot className="mr-2 h-4 w-4" />Assign to Recipe</DropdownMenuItem>
+                        <DropdownMenuLabel>Actions for {batch.id}</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => { /* TODO: Route to detail page or open detail modal */ toast({title: "Info", description: "Viewing details..."})}}><Eye className="mr-2 h-4 w-4" />View Details & Logs</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("advanceStage", batch)}><ArrowRightCircle className="mr-2 h-4 w-4" />Move to Next Stage</DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => handleRowAction("logWaste", batch)}><Recycle className="mr-2 h-4 w-4" />Log Waste</DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => handleRowAction("assignMetrc", batch)}><Tag className="mr-2 h-4 w-4" />Assign METRC Tag (Packaging)</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("printLabels", batch)}><Printer className="mr-2 h-4 w-4" />Print Packaging Labels</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleRowAction("assignRecipe", batch)}><CookingPot className="mr-2 h-4 w-4" />Assign to Recipe</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive hover:!text-destructive focus:!text-destructive focus:!bg-destructive/10">
+                        <DropdownMenuItem className="text-destructive hover:!text-destructive focus:!text-destructive focus:!bg-destructive/10" onClick={() => toast({title: "Archived", description: `Batch ${batch.id} archived.`, variant: "destructive"})}>
                           <Archive className="mr-2 h-4 w-4" />Archive Batch
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -170,6 +236,106 @@ export default function ProcessingBatchesPage() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Create New Batch Modal */}
+      <Dialog open={showCreateBatchModal} onOpenChange={setShowCreateBatchModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create New Processing Batch</DialogTitle>
+            <DialogDescription>Initiate a new processing workflow.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div><Label htmlFor="source-material-id">Source Material ID (Harvest/Batch)</Label><Input id="source-material-id" placeholder="e.g., HVT-001"/></div>
+            <div><Label htmlFor="product-type">Product Type</Label>
+                <Select><SelectTrigger><SelectValue placeholder="Select product type..."/></SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="Flower">Flower</SelectItem>
+                    <SelectItem value="Trim">Trim</SelectItem>
+                    <SelectItem value="Crude Extract">Crude Extract</SelectItem>
+                </SelectContent></Select>
+            </div>
+            <div><Label htmlFor="weight-in">Weight In (g)</Label><Input id="weight-in" type="number" placeholder="e.g., 5000"/></div>
+            <div><Label htmlFor="assigned-staff-proc">Assigned Staff</Label><Input id="assigned-staff-proc" placeholder="e.g., John Doe"/></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreateBatchModal(false)}>Cancel</Button>
+            <Button onClick={handleCreateBatch}>Create Batch</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Advance Stage Modal */}
+      <Dialog open={showAdvanceStageModal} onOpenChange={setShowAdvanceStageModal}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Advance Stage for Batch {selectedBatch?.id}</DialogTitle></DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="next-stage">Next Stage</Label>
+            <Select><SelectTrigger><SelectValue placeholder="Select next stage..."/></SelectTrigger>
+            <SelectContent>
+                <SelectItem value="Curing">Curing</SelectItem>
+                <SelectItem value="Trimming">Trimming</SelectItem>
+                <SelectItem value="Extraction">Extraction</SelectItem>
+                <SelectItem value="Awaiting Packaging">Awaiting Packaging</SelectItem>
+            </SelectContent></Select>
+            <Label htmlFor="weight-out-stage" className="mt-2">Weight Out (g) (Optional)</Label>
+            <Input id="weight-out-stage" type="number" placeholder="If applicable"/>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAdvanceStageModal(false)}>Cancel</Button>
+            <Button onClick={() => handleSubmitModal("advanceStage")}>Confirm Next Stage</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Log Waste Modal */}
+      <Dialog open={showLogWasteModal} onOpenChange={setShowLogWasteModal}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Log Waste for Batch {selectedBatch?.id}</DialogTitle></DialogHeader>
+          <div className="py-4 space-y-2">
+            <Label htmlFor="waste-weight">Waste Weight (g)</Label><Input id="waste-weight" type="number" placeholder="e.g., 50"/>
+            <Label htmlFor="waste-reason">Reason for Waste</Label><Textarea id="waste-reason" placeholder="Describe waste reason"/>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowLogWasteModal(false)}>Cancel</Button>
+            <Button onClick={() => handleSubmitModal("logWaste")}>Log Waste</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign METRC Modal */}
+       <Dialog open={showAssignMetrcModal} onOpenChange={setShowAssignMetrcModal}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Assign METRC Tag for {selectedBatch?.productType} from Batch {selectedBatch?.id}</DialogTitle></DialogHeader>
+          <div className="py-4 space-y-2">
+            <Label htmlFor="metrc-tag-input">New METRC Package Tag</Label><Input id="metrc-tag-input" placeholder="Scan or enter METRC Tag"/>
+            <Label htmlFor="package-weight">Package Weight (g)</Label><Input id="package-weight" type="number" placeholder="e.g., 3.5"/>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAssignMetrcModal(false)}>Cancel</Button>
+            <Button onClick={() => handleSubmitModal("assignMetrc")}>Assign Tag</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign Recipe Modal */}
+      <Dialog open={showAssignRecipeModal} onOpenChange={setShowAssignRecipeModal}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Assign Recipe to Batch {selectedBatch?.id}</DialogTitle></DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="recipe-select">Select Recipe</Label>
+            <Select><SelectTrigger><SelectValue placeholder="Choose a recipe..."/></SelectTrigger>
+            <SelectContent>
+                <SelectItem value="REC001">REC001 - CBD Tincture - 500mg Peppermint</SelectItem>
+                <SelectItem value="REC002">REC002 - Gummy Bears - 10mg THC Strawberry</SelectItem>
+            </SelectContent></Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAssignRecipeModal(false)}>Cancel</Button>
+            <Button onClick={() => handleSubmitModal("assignRecipe")}>Assign Recipe</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </PageContainer>
   );
 }
