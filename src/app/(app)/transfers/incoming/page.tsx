@@ -16,10 +16,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DownloadCloud, CheckCircle, XCircle, AlertTriangle, Filter, PackageCheck, Signature, Edit, History, TruckIcon } from "lucide-react"; // Changed Truck to TruckIcon
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DownloadCloud, CheckCircle, XCircle, AlertTriangle, Filter, PackageCheck, Signature, Edit, History, Truck } from "lucide-react"; // Changed TruckIcon to Truck
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 // Dummy data for incoming transfers
 const incomingTransfersData = [
@@ -30,8 +40,36 @@ const incomingTransfersData = [
 
 
 export default function IncomingTransfersPage() {
-  // For a real app, manage selectedTransfer state for detailed view
-  // const [selectedTransfer, setSelectedTransfer] = useState(null); 
+  const { toast } = useToast();
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedTransferForAction, setSelectedTransferForAction] = useState<typeof incomingTransfersData[0] | null>(null);
+
+  const handleOpenAcceptModal = (transfer: typeof incomingTransfersData[0]) => {
+    setSelectedTransferForAction(transfer);
+    setShowAcceptModal(true);
+  };
+
+  const handleAcceptTransfer = () => {
+    // TODO: Call acceptIncomingTransfer(selectedTransferForAction.manifestId, acceptanceData)
+    toast({ title: "Transfer Accepted", description: `Manifest ${selectedTransferForAction?.manifestId} accepted and inventory reconciled.` });
+    setShowAcceptModal(false);
+    setSelectedTransferForAction(null);
+    // Update local state or refetch data
+  };
+
+  const handleOpenRejectModal = (transfer: typeof incomingTransfersData[0]) => {
+    setSelectedTransferForAction(transfer);
+    setShowRejectModal(true);
+  };
+
+  const handleRejectTransfer = () => {
+    // TODO: Call rejectIncomingTransfer(selectedTransferForAction.manifestId, reason)
+    toast({ title: "Transfer Rejected", description: `Manifest ${selectedTransferForAction?.manifestId} rejected.`, variant: "destructive" });
+    setShowRejectModal(false);
+    setSelectedTransferForAction(null);
+    // Update local state or refetch data
+  };
 
   return (
     <PageContainer>
@@ -89,15 +127,15 @@ export default function IncomingTransfersPage() {
                   <TableCell className="text-right space-x-1">
                     {transfer.status === "Pending Acceptance" ? (
                         <>
-                        <Button variant="outline" size="sm" className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700 focus:ring-green-500">
+                        <Button variant="outline" size="sm" className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700 focus:ring-green-500" onClick={() => handleOpenAcceptModal(transfer)}>
                             <CheckCircle className="mr-1 h-3.5 w-3.5" /> Accept
                         </Button>
-                        <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700 focus:ring-red-500">
+                        <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700 focus:ring-red-500" onClick={() => handleOpenRejectModal(transfer)}>
                             <XCircle className="mr-1 h-3.5 w-3.5" /> Reject
                         </Button>
                         </>
                     ) : (
-                        <Button variant="ghost" size="sm"><History className="mr-1 h-3.5 w-3.5"/>View Log</Button>
+                        <Button variant="ghost" size="sm" onClick={() => toast({title: "Info", description: `Viewing log for ${transfer.manifestId}.`})}><History className="mr-1 h-3.5 w-3.5"/>View Log</Button>
                     )}
                   </TableCell>
                 </TableRow>
@@ -143,7 +181,7 @@ export default function IncomingTransfersPage() {
                  <div className="mt-3">
                     <Label htmlFor="discrepancy-notes">Discrepancy Notes / Damage Report</Label>
                     <Textarea id="discrepancy-notes" placeholder="Log any issues, e.g., 'Package #1A40... damaged, 1 unit short.'" rows={2}/>
-                    <Button variant="outline" size="sm" className="mt-1 text-xs"><Edit className="mr-1 h-3 w-3"/>Upload Photos</Button>
+                    <Button variant="outline" size="sm" className="mt-1 text-xs" onClick={() => toast({title:"Info", description:"Photo upload interface would open."})}><Edit className="mr-1 h-3 w-3"/>Upload Photos</Button>
                 </div>
                 <div className="mt-3">
                     <Label htmlFor="receiver-signature">Receiver Signature</Label>
@@ -152,8 +190,8 @@ export default function IncomingTransfersPage() {
                     </div>
                 </div>
                 <div className="mt-4 flex justify-end gap-2">
-                    <Button variant="destructive" className="bg-red-600 hover:bg-red-700">Reject Transfer</Button>
-                    <Button className="bg-green-600 hover:bg-green-700">Accept & Reconcile Inventory</Button>
+                    <Button variant="destructive" className="bg-red-600 hover:bg-red-700" onClick={() => incomingTransfersData[0] && handleOpenRejectModal(incomingTransfersData[0])}>Reject Transfer</Button>
+                    <Button className="bg-green-600 hover:bg-green-700" onClick={() => incomingTransfersData[0] && handleOpenAcceptModal(incomingTransfersData[0])}>Accept & Reconcile Inventory</Button>
                 </div>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -162,6 +200,51 @@ export default function IncomingTransfersPage() {
             </p>
         </CardContent>
       </Card>
+
+      {/* Accept Transfer Modal */}
+      <Dialog open={showAcceptModal} onOpenChange={setShowAcceptModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Accept Incoming Transfer: {selectedTransferForAction?.manifestId}</DialogTitle>
+            <DialogDescription>Confirm acceptance. Log any final notes or discrepancies below. Inventory will be updated.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="accept-notes">Final Acceptance Notes (Optional)</Label>
+            <Textarea id="accept-notes" placeholder="e.g., All items verified, 1 box slightly dented but contents okay." />
+            <div className="flex items-center space-x-2 mt-2">
+                <Input type="checkbox" id="accept-signature" />
+                <Label htmlFor="accept-signature" className="text-sm font-normal">Receiver Signature Captured</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAcceptModal(false)}>Cancel</Button>
+            <Button onClick={handleAcceptTransfer} className="bg-green-600 hover:bg-green-700">Confirm Acceptance</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Transfer Modal */}
+      <Dialog open={showRejectModal} onOpenChange={setShowRejectModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Incoming Transfer: {selectedTransferForAction?.manifestId}</DialogTitle>
+            <DialogDescription className="text-destructive">This action will formally reject the transfer. Provide a reason.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="reject-reason">Reason for Rejection</Label>
+            <Textarea id="reject-reason" placeholder="e.g., Significant damage to multiple packages, incorrect items, manifest mismatch." />
+             <div className="flex items-center space-x-2 mt-2">
+                <Input type="checkbox" id="reject-photo-evidence" />
+                <Label htmlFor="reject-photo-evidence" className="text-sm font-normal">Photo Evidence Attached</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRejectModal(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleRejectTransfer}>Confirm Rejection</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </PageContainer>
   );
 }

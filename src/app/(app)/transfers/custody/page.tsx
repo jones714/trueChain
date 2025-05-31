@@ -5,9 +5,21 @@ import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, MapPin, Clock, Compass, Edit, FileText, Download, Filter, AlertTriangle, Camera, ShieldCheck, Signature } from "lucide-react"; // Added Signature
+import { Users, MapPin, Clock, Compass, Edit, FileText, Download, Filter, AlertTriangle, Camera, ShieldCheck, Signature, PlusCircle } from "lucide-react"; // Added PlusCircle
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label"; // Added Label
+import { Textarea } from "@/components/ui/textarea"; // Added Textarea
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"; // Added Dialog components
+import { useState } from "react"; // Added useState
+import { useToast } from "@/hooks/use-toast"; // Added useToast
 
 const custodyLogData = [
     { manifestId: "MFT-00123", event: "Departure", timestamp: "2023-11-15 10:00 AM", actor: "John D. (Driver)", vehicle: "VAN-01 (PLATE-ABC)", location: "Main Cultivation - Dock A", geo: "34.0522° N, 118.2437° W", notes: "All packages verified.", signature: true, photo: false, isComplete: true },
@@ -19,6 +31,22 @@ const custodyLogData = [
 
 
 export default function ChainOfCustodyPage() {
+  const { toast } = useToast();
+  const [showLogCheckpointModal, setShowLogCheckpointModal] = useState(false);
+  const [selectedManifestForLog, setSelectedManifestForLog] = useState<string | null>(null);
+
+  const handleOpenLogCheckpointModal = (manifestId?: string) => {
+    setSelectedManifestForLog(manifestId || null);
+    setShowLogCheckpointModal(true);
+  };
+
+  const handleSaveLogCheckpoint = () => {
+    // TODO: Call backend function addCustodyLogEntry(manifestId, logData)
+    toast({ title: "Log Entry Saved", description: `New CoC entry for manifest ${selectedManifestForLog || 'N/A'} saved.` });
+    setShowLogCheckpointModal(false);
+    setSelectedManifestForLog(null);
+  };
+
   return (
     <PageContainer>
       <PageHeader 
@@ -28,6 +56,7 @@ export default function ChainOfCustodyPage() {
          <div className="flex items-center space-x-2">
             <Input placeholder="Filter by Manifest ID, Driver, Date..." className="max-w-xs" />
             <Button variant="outline"><Filter className="mr-2 h-4 w-4"/>Apply Filters</Button>
+            <Button onClick={() => handleOpenLogCheckpointModal()}><PlusCircle className="mr-2 h-4 w-4"/>Log New Checkpoint</Button>
             <Button variant="outline"><Download className="mr-2 h-4 w-4"/>Export Log</Button>
         </div>
       </PageHeader>
@@ -66,8 +95,8 @@ export default function ChainOfCustodyPage() {
                             </div>
                         </div>
                         <div className="text-right mt-2">
-                             <Button variant="ghost" size="sm"><FileText className="mr-1 h-3 w-3"/>View Full Manifest</Button>
-                             <Button variant="ghost" size="sm" className="ml-1"><Edit className="mr-1 h-3 w-3"/>Add/Edit Log Entry</Button>
+                             <Button variant="ghost" size="sm" onClick={() => toast({title:"Info", description:`Viewing details for manifest ${log.manifestId}`})}><FileText className="mr-1 h-3 w-3"/>View Full Manifest</Button>
+                             <Button variant="ghost" size="sm" className="ml-1" onClick={() => handleOpenLogCheckpointModal(log.manifestId)}><Edit className="mr-1 h-3 w-3"/>Add/Edit Log Entry</Button>
                         </div>
                     </div>
                 ))}
@@ -80,6 +109,30 @@ export default function ChainOfCustodyPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Log Checkpoint Modal */}
+      <Dialog open={showLogCheckpointModal} onOpenChange={setShowLogCheckpointModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Log Chain of Custody Checkpoint</DialogTitle>
+            <DialogDescription>Record a new event for manifest {selectedManifestForLog || "(New Manifest)"}.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-4">
+            <div><Label htmlFor="coc-manifest-id">Manifest ID</Label><Input id="coc-manifest-id" defaultValue={selectedManifestForLog || ""} placeholder="e.g., MFT-00123"/></div>
+            <div><Label htmlFor="coc-event-type">Event Type</Label><Input id="coc-event-type" placeholder="e.g., Departure, Arrival, Handoff, Checkpoint"/></div>
+            <div><Label htmlFor="coc-actor">Actor (Driver/Staff Name)</Label><Input id="coc-actor" placeholder="e.g., John D."/></div>
+            <div><Label htmlFor="coc-location">Location (GPS or Manual)</Label><Input id="coc-location" placeholder="e.g., Facility Dock A or GPS Coordinates"/></div>
+            <div><Label htmlFor="coc-notes">Notes</Label><Textarea id="coc-notes" placeholder="Details of the event..."/></div>
+            <div className="flex items-center space-x-2"><Input type="checkbox" id="coc-signature"/><Label htmlFor="coc-signature">Capture Signature</Label></div>
+            <div className="flex items-center space-x-2"><Input type="checkbox" id="coc-photo"/><Label htmlFor="coc-photo">Attach Photo</Label></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowLogCheckpointModal(false)}>Cancel</Button>
+            <Button onClick={handleSaveLogCheckpoint}>Save Log Entry</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </PageContainer>
   );
 }

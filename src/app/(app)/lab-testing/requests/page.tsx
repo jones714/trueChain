@@ -18,8 +18,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { PlusCircle, Send, Upload, FileText, Users, Edit, Clock, Package, Sprout, TestTubeDiagonal } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useSearchParams } from 'next/navigation';
+
 
 const testRequests = [
   { id: "REQ-001", sourceBatch: "HVT-001", lab: "Anresco Labs", status: "Sample Sent", dateCreated: "2023-10-28", qaStaff: "Diana P." },
@@ -41,14 +53,30 @@ const testTypes = [
 
 
 export default function LabTestRequestsPage() {
+  const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const [showCreateRequestModal, setShowCreateRequestModal] = useState(false);
+
+  useState(() => {
+    if (searchParams?.get('action') === 'create') {
+      setShowCreateRequestModal(true);
+    }
+  });
+
+  const handleSubmitTestRequest = () => {
+    // TODO: Call createTestRequest(data)
+    toast({ title: "Success", description: "Lab test request submitted." });
+    setShowCreateRequestModal(false);
+  };
+
   return (
     <PageContainer>
       <PageHeader 
         title="Lab Testing Requests" 
         description="Create, manage, and track lab test requests. Testing templates can be predefined for different product types to streamline this process."
       >
-        <Button disabled> 
-          <PlusCircle className="mr-2 h-4 w-4" /> Use Testing Template
+        <Button onClick={() => setShowCreateRequestModal(true)}> 
+          <PlusCircle className="mr-2 h-4 w-4" /> Create New Test Request
         </Button>
       </PageHeader>
 
@@ -56,13 +84,14 @@ export default function LabTestRequestsPage() {
         <div className="lg:col-span-1">
           <Card>
             <CardHeader>
-              <CardTitle>Create New Test Request</CardTitle>
+              <CardTitle>Create New Test Request (Form)</CardTitle>
+              <CardDescription>Use the button above or this form to create requests.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="source-type">Source Type</Label>
+                <Label htmlFor="form-source-type">Source Type</Label>
                 <Select>
-                  <SelectTrigger id="source-type"><SelectValue placeholder="Select source type..." /></SelectTrigger>
+                  <SelectTrigger id="form-source-type"><SelectValue placeholder="Select source type..." /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="plant_batch"><Sprout className="inline h-4 w-4 mr-2" />Plant Batch</SelectItem>
                     <SelectItem value="extract"><TestTubeDiagonal className="inline h-4 w-4 mr-2" />Extract/Concentrate</SelectItem>
@@ -72,24 +101,24 @@ export default function LabTestRequestsPage() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="source-id">Source Batch/Product ID</Label>
-                <Input id="source-id" placeholder="e.g., HVT-001, BATCH-EXT-005" />
+                <Label htmlFor="form-source-id">Source Batch/Product ID</Label>
+                <Input id="form-source-id" placeholder="e.g., HVT-001, BATCH-EXT-005" />
               </div>
               <div>
                 <Label>Requested Tests</Label>
                 <div className="space-y-2 max-h-48 overflow-y-auto p-2 border rounded-md">
                   {testTypes.map(type => (
                     <div key={type.id} className="flex items-center space-x-2">
-                      <Checkbox id={`test-${type.id}`} />
-                      <Label htmlFor={`test-${type.id}`} className="font-normal text-sm">{type.label}</Label>
+                      <Checkbox id={`form-test-${type.id}`} />
+                      <Label htmlFor={`form-test-${type.id}`} className="font-normal text-sm">{type.label}</Label>
                     </div>
                   ))}
                 </div>
               </div>
               <div>
-                <Label htmlFor="lab-partner">Lab Partner</Label>
+                <Label htmlFor="form-lab-partner">Lab Partner</Label>
                 <Select>
-                  <SelectTrigger id="lab-partner"><SelectValue placeholder="Select lab..." /></SelectTrigger>
+                  <SelectTrigger id="form-lab-partner"><SelectValue placeholder="Select lab..." /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="lab_xyz">Lab XYZ (Default)</SelectItem>
                     <SelectItem value="anresco">Anresco Laboratories</SelectItem>
@@ -99,22 +128,22 @@ export default function LabTestRequestsPage() {
                 </Select>
               </div>
                <div>
-                <Label htmlFor="qa-staff">Assigned Internal QA Staff</Label>
-                <Input id="qa-staff" placeholder="e.g., Diana Prince" />
+                <Label htmlFor="form-qa-staff">Assigned Internal QA Staff</Label>
+                <Input id="form-qa-staff" placeholder="e.g., Diana Prince" />
               </div>
               <div>
-                <Label htmlFor="lab-contact">Lab Contact Person (Optional)</Label>
-                <Input id="lab-contact" placeholder="e.g., Dr. Egon Spengler" />
+                <Label htmlFor="form-lab-contact">Lab Contact Person (Optional)</Label>
+                <Input id="form-lab-contact" placeholder="e.g., Dr. Egon Spengler" />
               </div>
               <div>
-                <Label htmlFor="sample-photo">Attach Photo (Sample Label/CoC)</Label>
-                <Input id="sample-photo" type="file" />
+                <Label htmlFor="form-sample-photo">Attach Photo (Sample Label/CoC)</Label>
+                <Input id="form-sample-photo" type="file" />
               </div>
               <div>
-                <Label htmlFor="notes">Notes</Label>
-                <Textarea id="notes" placeholder="Any specific instructions or notes for the lab or internal team." />
+                <Label htmlFor="form-notes">Notes</Label>
+                <Textarea id="form-notes" placeholder="Any specific instructions or notes for the lab or internal team." />
               </div>
-              <Button className="w-full"><Send className="mr-2 h-4 w-4"/>Submit Test Request</Button>
+              <Button className="w-full" onClick={handleSubmitTestRequest}><Send className="mr-2 h-4 w-4"/>Submit Test Request</Button>
             </CardContent>
           </Card>
         </div>
@@ -158,8 +187,8 @@ export default function LabTestRequestsPage() {
                         <TableCell>{req.dateCreated}</TableCell>
                         <TableCell>{req.qaStaff}</TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="icon" title="View Details"><FileText className="h-4 w-4"/></Button>
-                          <Button variant="ghost" size="icon" title="Update Status"><Edit className="h-4 w-4"/></Button>
+                          <Button variant="ghost" size="icon" title="View Details" onClick={() => toast({ title: "Info", description: `Viewing details for ${req.id}`})}><FileText className="h-4 w-4"/></Button>
+                          <Button variant="ghost" size="icon" title="Update Status" onClick={() => toast({ title: "Info", description: `Updating status for ${req.id}`})}><Edit className="h-4 w-4"/></Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -188,6 +217,65 @@ export default function LabTestRequestsPage() {
           </Card>
         </div>
       </div>
+
+      {/* Create New Test Request Modal (triggered by header button) */}
+      <Dialog open={showCreateRequestModal} onOpenChange={setShowCreateRequestModal}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Create New Lab Test Request</DialogTitle>
+            <DialogDescription>Fill in the details for the new test request.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
+             <div>
+                <Label htmlFor="modal-source-type">Source Type</Label>
+                <Select>
+                  <SelectTrigger id="modal-source-type"><SelectValue placeholder="Select source type..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="plant_batch"><Sprout className="inline h-4 w-4 mr-2" />Plant Batch</SelectItem>
+                    <SelectItem value="extract"><TestTubeDiagonal className="inline h-4 w-4 mr-2" />Extract/Concentrate</SelectItem>
+                    <SelectItem value="edible"><Package className="inline h-4 w-4 mr-2" />Edible/Infused Product</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="modal-source-id">Source Batch/Product ID</Label>
+                <Input id="modal-source-id" placeholder="e.g., HVT-001" />
+              </div>
+              <div>
+                <Label>Requested Tests</Label>
+                <div className="space-y-1 max-h-32 overflow-y-auto p-1 border rounded-md">
+                  {testTypes.map(type => (
+                    <div key={`modal-${type.id}`} className="flex items-center space-x-2">
+                      <Checkbox id={`modal-test-${type.id}`} />
+                      <Label htmlFor={`modal-test-${type.id}`} className="font-normal text-sm">{type.label}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="modal-lab-partner">Lab Partner</Label>
+                <Select>
+                  <SelectTrigger id="modal-lab-partner"><SelectValue placeholder="Select lab..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="lab_xyz">Lab XYZ (Default)</SelectItem>
+                    {/* Add other labs */}
+                  </SelectContent>
+                </Select>
+              </div>
+               <div>
+                <Label htmlFor="modal-qa-staff">Assigned Internal QA Staff</Label>
+                <Input id="modal-qa-staff" placeholder="e.g., Diana Prince" />
+              </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreateRequestModal(false)}>Cancel</Button>
+            <Button onClick={handleSubmitTestRequest}>Submit Request</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </PageContainer>
   );
 }
+    

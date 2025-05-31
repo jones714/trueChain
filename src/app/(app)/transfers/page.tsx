@@ -6,6 +6,16 @@ import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { 
   FileText, 
   PlusCircle, 
   CheckCircle, 
@@ -16,9 +26,13 @@ import {
   Timer, 
   MapIcon, 
   BarChart3,
-  Flag
+  Flag,
+  Truck, // Changed from TruckIcon
+  User
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 // Dummy data for KPIs and transfer list
 const kpiData = {
@@ -37,6 +51,15 @@ const activeTransfers = [
 ];
 
 export default function TransfersPage() {
+  const { toast } = useToast();
+  const [showFlagIssueModal, setShowFlagIssueModal] = useState(false);
+
+  const handleFlagIssue = () => {
+    // TODO: Logic to flag an issue, e.g., create an alert or notification
+    toast({ title: "Issue Flagged", description: "Compliance or operational issue has been flagged for review.", variant: "destructive" });
+    setShowFlagIssueModal(false);
+  };
+
   return (
     <PageContainer>
       <PageHeader 
@@ -50,7 +73,7 @@ export default function TransfersPage() {
            <Button variant="outline" asChild>
             <Link href="/transfers/incoming"><CheckCircle className="mr-2 h-4 w-4" /> Accept Incoming</Link>
           </Button>
-          <Button variant="destructive" className="bg-amber-500 hover:bg-amber-600 border-amber-500 text-white">
+          <Button variant="destructive" className="bg-amber-500 hover:bg-amber-600 border-amber-500 text-white" onClick={() => setShowFlagIssueModal(true)}>
             <Flag className="mr-2 h-4 w-4" /> Flag Issue
           </Button>
         </div>
@@ -123,8 +146,8 @@ export default function TransfersPage() {
                             </p>
                         </div>
                         <div className="space-x-2">
-                            <Button variant="outline" size="sm" asChild><Link href={`/transfers/manifests/${transfer.id}`}><FileText className="mr-1 h-3 w-3"/> View Manifest</Link></Button>
-                            {transfer.status === "In Transit" && <Button variant="outline" size="sm">Track</Button>}
+                            <Button variant="outline" size="sm" asChild><Link href={`/transfers/manifests?manifestId=${transfer.id}`}><FileText className="mr-1 h-3 w-3"/> View Manifest</Link></Button>
+                            {transfer.status === "In Transit" && <Button variant="outline" size="sm" onClick={() => toast({title: "Track Info", description:"Showing tracking details for " + transfer.id})}>Track</Button>}
                             {transfer.status === "Pending Acceptance" && (
                                 <>
                                 <Button variant="outline" size="sm" className="text-green-600 border-green-600 hover:bg-green-50" asChild><Link href={`/transfers/incoming?manifestId=${transfer.id}`}><CheckCircle className="mr-1 h-3 w-3"/> Process</Link></Button>
@@ -162,6 +185,37 @@ export default function TransfersPage() {
                  <Button variant="outline" className="mt-3" disabled>Plan New Route</Button>
             </CardContent>
         </Card>
+
+      {/* Flag Issue Modal */}
+      <Dialog open={showFlagIssueModal} onOpenChange={setShowFlagIssueModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Flag Transfer/Logistics Issue</DialogTitle>
+            <DialogDescription>
+              Report a compliance concern, vehicle problem, driver issue, or any other notable event related to transfers.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-3">
+            <div>
+              <Label htmlFor="issue-type">Issue Type</Label>
+              <Input id="issue-type" placeholder="e.g., Compliance, Vehicle, Driver, Security" />
+            </div>
+            <div>
+              <Label htmlFor="issue-manifest-id">Associated Manifest ID (Optional)</Label>
+              <Input id="issue-manifest-id" placeholder="e.g., MFT-00123" />
+            </div>
+            <div>
+              <Label htmlFor="issue-description">Description of Issue</Label>
+              <Input id="issue-description" placeholder="Provide details..." />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowFlagIssueModal(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleFlagIssue}>Submit Issue</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </PageContainer>
   );
 }

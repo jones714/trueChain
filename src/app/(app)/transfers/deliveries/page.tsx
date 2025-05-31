@@ -6,6 +6,9 @@ import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -15,6 +18,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
     PlusCircle, 
     MapPinned, 
@@ -26,7 +37,7 @@ import {
     MessageCircleWarning, 
     BellDot, 
     ListFilter, 
-    TruckIcon,
+    Truck, // Changed from TruckIcon
     User,
     BadgeInfo,
     ShieldCheck,
@@ -39,6 +50,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const deliveryQueueData = [
   { id: "DEL001", customer: "Jane Doe (Medical)", address: "123 Main St, Anytown", timeWindow: "2:00 PM - 4:00 PM", driver: "John D.", vehicle: "VAN-01", status: "Scheduled", items: 3, manifestId: "MFT-CUST-001" },
@@ -48,6 +61,34 @@ const deliveryQueueData = [
 ];
 
 export default function CustomerDeliveriesPage() {
+  const { toast } = useToast();
+  const [showScheduleDeliveryModal, setShowScheduleDeliveryModal] = useState(false);
+  const [showEditDeliveryModal, setShowEditDeliveryModal] = useState(false);
+  const [selectedDelivery, setSelectedDelivery] = useState<typeof deliveryQueueData[0] | null>(null);
+
+  const handleScheduleNewDelivery = () => {
+    // TODO: Call backend function scheduleCustomerDelivery(data)
+    toast({ title: "Delivery Scheduled", description: "New customer delivery has been scheduled." });
+    setShowScheduleDeliveryModal(false);
+  };
+
+  const handleEditDelivery = (delivery: typeof deliveryQueueData[0]) => {
+    setSelectedDelivery(delivery);
+    setShowEditDeliveryModal(true);
+  };
+  
+  const handleSaveEditedDelivery = () => {
+    // TODO: Call backend function updateCustomerDelivery(selectedDelivery.id, updatedData)
+    toast({ title: "Delivery Updated", description: `Delivery ${selectedDelivery?.id} details updated.` });
+    setShowEditDeliveryModal(false);
+    setSelectedDelivery(null);
+  };
+
+  const handleOptimizeRoutes = () => {
+    // TODO: Call backend function optimizeDeliveryRoutes(selectedDateOrQueue)
+    toast({ title: "Routes Optimization", description: "Routes are being optimized (conceptual)." });
+  };
+
   return (
     <PageContainer>
       <PageHeader 
@@ -55,10 +96,10 @@ export default function CustomerDeliveriesPage() {
         description="Oversee and manage direct-to-customer deliveries for both medical and adult-use cannabis. Includes route optimization, driver assignment, manifest generation, ID verification, and compliance logging."
       >
         <div className="flex flex-wrap gap-2">
-          <Button>
+          <Button onClick={() => setShowScheduleDeliveryModal(true)}>
             <PlusCircle className="mr-2 h-4 w-4" /> Schedule New Delivery
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleOptimizeRoutes}>
             <Route className="mr-2 h-4 w-4" /> Optimize Routes
           </Button>
         </div>
@@ -66,7 +107,7 @@ export default function CustomerDeliveriesPage() {
 
       <Tabs defaultValue="queue">
         <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 mb-4">
-          <TabsTrigger value="queue"><TruckIcon className="mr-1 h-4 w-4 hidden sm:inline-block"/>Delivery Queue</TabsTrigger>
+          <TabsTrigger value="queue"><Truck className="mr-1 h-4 w-4 hidden sm:inline-block"/>Delivery Queue</TabsTrigger>
           <TabsTrigger value="workflow"><Fingerprint className="mr-1 h-4 w-4 hidden sm:inline-block"/>Delivery Workflow</TabsTrigger>
           <TabsTrigger value="reports"><HistoryIcon className="mr-1 h-4 w-4 hidden sm:inline-block"/>Reports & KPIs</TabsTrigger>
         </TabsList>
@@ -111,7 +152,7 @@ export default function CustomerDeliveriesPage() {
                         <TableCell>
                             <Badge variant={
                                 delivery.status === "Scheduled" ? "secondary" :
-                                delivery.status === "En Route" ? "default" : // Consider primary for active
+                                delivery.status === "En Route" ? "default" : 
                                 delivery.status === "Delivered" ? "outline" :
                                 "destructive"
                             } className={cn(
@@ -122,8 +163,8 @@ export default function CustomerDeliveriesPage() {
                             )}>{delivery.status}</Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                            <Button variant="ghost" size="icon" title="View Details"><PackageCheck className="h-4 w-4"/></Button>
-                            <Button variant="ghost" size="icon" title="Edit Delivery"><Edit className="h-4 w-4"/></Button>
+                            <Button variant="ghost" size="icon" title="View Details" onClick={() => toast({title: "Info", description: `Viewing details for delivery ${delivery.id}`})}><PackageCheck className="h-4 w-4"/></Button>
+                            <Button variant="ghost" size="icon" title="Edit Delivery" onClick={() => handleEditDelivery(delivery)}><Edit className="h-4 w-4"/></Button>
                         </TableCell>
                         </TableRow>
                     ))}
@@ -131,7 +172,7 @@ export default function CustomerDeliveriesPage() {
                 </Table>
                 {deliveryQueueData.length === 0 && (
                     <div className="mt-4 p-8 border border-dashed rounded-md text-center text-muted-foreground">
-                    <TruckIcon className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                    <Truck className="mx-auto h-12 w-12 text-muted-foreground/50" />
                     <p className="mt-2">No deliveries currently in the queue.</p>
                     </div>
                 )}
@@ -211,13 +252,61 @@ export default function CustomerDeliveriesPage() {
                             <li>Compliance & ID Verification Logs</li>
                             <li>Failed Delivery Analysis</li>
                         </ul>
-                        <Button variant="outline" className="mt-3">Download Reports</Button>
+                        <Button variant="outline" className="mt-3" onClick={() => toast({title: "Report Downloaded", description: "Delivery reports are being generated (conceptual)."})}>Download Reports</Button>
                     </div>
                     <p className="text-xs text-muted-foreground">All delivery actions are logged and auditable. Role-based access controls apply.</p>
                 </CardContent>
             </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Schedule New Delivery Modal */}
+      <Dialog open={showScheduleDeliveryModal} onOpenChange={setShowScheduleDeliveryModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Schedule New Customer Delivery</DialogTitle>
+            <DialogDescription>Enter customer, order, and delivery details.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-4 max-h-[60vh] overflow-y-auto pr-2">
+            <div><Label htmlFor="del-customer-id">Customer/Patient ID</Label><Input id="del-customer-id" placeholder="e.g., CUST001 or PAT001" /></div>
+            <div><Label htmlFor="del-order-id">Sales Order ID</Label><Input id="del-order-id" placeholder="e.g., SALE007" /></div>
+            <div><Label htmlFor="del-address">Delivery Address</Label><Textarea id="del-address" placeholder="123 Cannabis Ln, Anytown, USA" /></div>
+            <div><Label htmlFor="del-date">Delivery Date</Label><Input id="del-date" type="date" /></div>
+            <div><Label htmlFor="del-time-window">Time Window</Label><Input id="del-time-window" placeholder="e.g., 2:00 PM - 4:00 PM" /></div>
+            <div><Label htmlFor="del-driver">Assign Driver</Label><Input id="del-driver" placeholder="Select driver..." /></div>
+            <div className="flex items-center space-x-2"><Checkbox id="del-id-verify" /><Label htmlFor="del-id-verify" className="font-normal">ID Verification Required at Drop-off</Label></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowScheduleDeliveryModal(false)}>Cancel</Button>
+            <Button onClick={handleScheduleNewDelivery}>Schedule Delivery</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Delivery Modal */}
+      <Dialog open={showEditDeliveryModal} onOpenChange={setShowEditDeliveryModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Delivery: {selectedDelivery?.id}</DialogTitle>
+            <DialogDescription>Update delivery details as needed.</DialogDescription>
+          </DialogHeader>
+           <div className="grid gap-3 py-4 max-h-[60vh] overflow-y-auto pr-2">
+            <div><Label htmlFor="edit-del-customer-id">Customer/Patient ID</Label><Input id="edit-del-customer-id" defaultValue={selectedDelivery?.customer} /></div>
+            <div><Label htmlFor="edit-del-address">Delivery Address</Label><Textarea id="edit-del-address" defaultValue={deliveryQueueData.find(d=>d.id === selectedDelivery?.id)?.address} /></div>
+            <div><Label htmlFor="edit-del-time-window">Time Window</Label><Input id="edit-del-time-window" defaultValue={selectedDelivery?.timeWindow} /></div>
+            <div><Label htmlFor="edit-del-driver">Assign Driver</Label><Input id="edit-del-driver" defaultValue={selectedDelivery?.driver} /></div>
+            <div><Label htmlFor="edit-del-status">Status</Label>
+                <select className="w-full p-2 border rounded-md text-sm" defaultValue={selectedDelivery?.status}>
+                    <option>Scheduled</option><option>En Route</option><option>Delivered</option><option>Failed Attempt</option><option>Cancelled</option>
+                </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {setShowEditDeliveryModal(false); setSelectedDelivery(null);}}>Cancel</Button>
+            <Button onClick={handleSaveEditedDelivery}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </PageContainer>
   );

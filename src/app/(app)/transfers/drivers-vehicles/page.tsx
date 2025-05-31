@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label"; // Added Label
 import {
   Table,
   TableBody,
@@ -14,9 +15,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { UserPlus, Car, PlusCircle, Edit, AlertTriangle, ShieldCheck, Search } from "lucide-react"; // Using Car for vehicle
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"; // Added Dialog components
+import { UserPlus, Car, PlusCircle, Edit, AlertTriangle, ShieldCheck, Search } from "lucide-react"; 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useState } from "react"; // Added useState
+import { useToast } from "@/hooks/use-toast"; // Added useToast
 
 // Dummy data
 const drivers = [
@@ -32,6 +43,35 @@ const vehicles = [
 ];
 
 export default function DriversVehiclesPage() {
+  const { toast } = useToast();
+  const [showAddDriverModal, setShowAddDriverModal] = useState(false);
+  const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
+  // Add state for edit modals if needed
+  // const [editingDriver, setEditingDriver] = useState<typeof drivers[0] | null>(null);
+  // const [editingVehicle, setEditingVehicle] = useState<typeof vehicles[0] | null>(null);
+
+  const handleAddDriver = () => {
+    // TODO: Call addDriver(data)
+    toast({ title: "Driver Added", description: "New driver has been added to the registry." });
+    setShowAddDriverModal(false);
+  };
+
+  const handleAddVehicle = () => {
+    // TODO: Call addVehicle(data)
+    toast({ title: "Vehicle Added", description: "New vehicle has been added to the registry." });
+    setShowAddVehicleModal(false);
+  };
+
+  const handleEditDriver = (driverId: string) => {
+    // TODO: Open modal with driver data pre-filled, then call updateDriver(driverId, data)
+    toast({ title: "Edit Driver", description: `Opening edit form for driver ${driverId}.` });
+  };
+  
+  const handleEditVehicle = (vehicleId: string) => {
+    // TODO: Open modal with vehicle data pre-filled, then call updateVehicle(vehicleId, data)
+    toast({ title: "Edit Vehicle", description: `Opening edit form for vehicle ${vehicleId}.` });
+  };
+
   return (
     <PageContainer>
       <PageHeader 
@@ -43,7 +83,7 @@ export default function DriversVehiclesPage() {
           <CardHeader>
             <div className="flex justify-between items-center">
                 <CardTitle>Driver Registry</CardTitle>
-                <Button size="sm"><UserPlus className="mr-2 h-4 w-4"/>Add New Driver</Button>
+                <Button size="sm" onClick={() => setShowAddDriverModal(true)}><UserPlus className="mr-2 h-4 w-4"/>Add New Driver</Button>
             </div>
             <CardDescription>Maintain records of all transport drivers, including contact info, license details, background check status, and insurance. Alerts for expired documents.</CardDescription>
             <Input placeholder="Search drivers..." className="mt-2 max-w-sm" />
@@ -85,7 +125,7 @@ export default function DriversVehiclesPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleEditDriver(driver.id)}><Edit className="h-4 w-4"/></Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -98,7 +138,7 @@ export default function DriversVehiclesPage() {
           <CardHeader>
             <div className="flex justify-between items-center">
                 <CardTitle>Vehicle Registry</CardTitle>
-                <Button size="sm"><Car className="mr-2 h-4 w-4"/>Add New Vehicle</Button>
+                <Button size="sm" onClick={() => setShowAddVehicleModal(true)}><Car className="mr-2 h-4 w-4"/>Add New Vehicle</Button>
             </div>
             <CardDescription>Maintain records of all transport vehicles, including VIN, plate, type, compliance status, last inspection, and insurance. Alerts for non-compliant vehicles.</CardDescription>
             <Input placeholder="Search vehicles by plate, VIN, type..." className="mt-2 max-w-sm" />
@@ -137,7 +177,7 @@ export default function DriversVehiclesPage() {
                       {!vehicle.metrcCompliant && <Badge variant="destructive" className="ml-1">Not METRC Compliant</Badge>}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon"><Edit className="h-4 w-4"/></Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleEditVehicle(vehicle.id)}><Edit className="h-4 w-4"/></Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -146,6 +186,52 @@ export default function DriversVehiclesPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Add Driver Modal */}
+      <Dialog open={showAddDriverModal} onOpenChange={setShowAddDriverModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Driver</DialogTitle>
+            <DialogDescription>Enter driver details and upload relevant documents.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-4">
+            <div><Label htmlFor="driver-name">Full Name</Label><Input id="driver-name" placeholder="John Doe"/></div>
+            <div><Label htmlFor="driver-license">License Number</Label><Input id="driver-license" placeholder="S12345678"/></div>
+            <div><Label htmlFor="driver-license-expiry">License Expiry Date</Label><Input id="driver-license-expiry" type="date"/></div>
+            <div><Label htmlFor="driver-insurance-expiry">Insurance Expiry Date</Label><Input id="driver-insurance-expiry" type="date"/></div>
+            <div><Label htmlFor="driver-contact">Contact Info</Label><Input id="driver-contact" placeholder="Phone or Email"/></div>
+            {/* Add fields for background check status, document uploads */}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddDriverModal(false)}>Cancel</Button>
+            <Button onClick={handleAddDriver}>Add Driver</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Vehicle Modal */}
+      <Dialog open={showAddVehicleModal} onOpenChange={setShowAddVehicleModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Vehicle</DialogTitle>
+            <DialogDescription>Enter vehicle details and compliance information.</DialogDescription>
+          </DialogHeader>
+           <div className="grid gap-3 py-4">
+            <div><Label htmlFor="vehicle-plate">License Plate</Label><Input id="vehicle-plate" placeholder="XYZ 123"/></div>
+            <div><Label htmlFor="vehicle-vin">VIN</Label><Input id="vehicle-vin" placeholder="17-character VIN"/></div>
+            <div><Label htmlFor="vehicle-type">Vehicle Type</Label><Input id="vehicle-type" placeholder="e.g., Van, Armored Truck, Refrigerated"/></div>
+            <div><Label htmlFor="vehicle-inspection-date">Last Inspection Date</Label><Input id="vehicle-inspection-date" type="date"/></div>
+            <div><Label htmlFor="vehicle-insurance-expiry">Insurance Expiry Date</Label><Input id="vehicle-insurance-expiry" type="date"/></div>
+            <div className="flex items-center space-x-2"><Input type="checkbox" id="vehicle-metrc-compliant"/><Label htmlFor="vehicle-metrc-compliant">METRC Compliant</Label></div>
+            {/* Add fields for registration, document uploads */}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddVehicleModal(false)}>Cancel</Button>
+            <Button onClick={handleAddVehicle}>Add Vehicle</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </PageContainer>
   );
 }
