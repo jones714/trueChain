@@ -19,7 +19,7 @@ export function UserNav() {
   // In a real app, user data would come from context or props
   const user = {
     name: "Admin User",
-    email: "admin@trucanalytix.com",
+    email: "admin@truchain.com",
     avatar: "https://placehold.co/40x40.png", 
   }
 

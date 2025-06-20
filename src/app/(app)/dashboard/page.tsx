@@ -95,7 +95,7 @@ export default function DashboardPageV2() {
   return (
     <PageContainer>
       <PageHeader
-        title="TruCanalytix Command Center"
+        title="TruChain Command Center"
         description={`Welcome back, ${userRole}! This is your dynamic overview. Widgets are role-aware and can be customized (drag & drop, hide/show - preferences saved to /users/{userId}/dashboardPreferences) to display relevant KPIs and tools. Non-critical widgets are deferred for faster initial load.`}
       >
         <Button variant="outline" size="sm">

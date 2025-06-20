@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'TruCanalytix',
+  title: 'TruChain',
   description: 'Comprehensive Cannabis Compliance and Management Platform',
 };
 

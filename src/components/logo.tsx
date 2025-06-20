@@ -6,7 +6,7 @@ export function Logo({ collapsed }: { collapsed?: boolean }) {
     <Link href="/dashboard" className="flex items-center gap-2 text-primary hover:text-primary/90 transition-colors duration-200">
       <Leaf className="h-7 w-7 text-primary" />
       {!collapsed && (
-         <h1 className="text-xl font-bold whitespace-nowrap">TruCanalytix</h1>
+         <h1 className="text-xl font-bold whitespace-nowrap">TruChain</h1>
       )}
     </Link>
   );
