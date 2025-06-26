@@ -1,210 +1,149 @@
-# TruChain Application Inventory & Technical Overview
 
-This document provides a detailed inventory of all pages, components, features, and the overall structure of the TruChain web application as of the current build.
+# TruChain Application Inventory
 
----
+This document provides a comprehensive inventory of all pages, components, utilities, and other core files within the TruChain web application.
 
-## 1. Top-Level Pages & Application Modules
+## 1. Application Pages & Modules
 
-The application is structured using Next.js App Router.
+This section lists all user-facing pages, grouped by their respective modules.
 
-### Core Pages
-- **`/login`**: (`src/app/login/page.tsx`) - Authentication page for users to log in.
-- **`/` (Root)**: (`src/app/page.tsx`) - Redirects authenticated users to the dashboard.
+### Core App Shell & Top-Level Pages
 
-### Main Application Layout (`src/app/(app)/layout.tsx`)
+-   **`src/app/layout.tsx`**: The root layout for the entire application, including `<html>` and `<body>`.
+-   **`src/app/(app)/layout.tsx`**: The main application layout, containing the persistent sidebar and header.
+-   **`src/app/page.tsx`**: The root page, which redirects to `/dashboard`.
+-   **`src/app/login/page.tsx`**: The user authentication/login page.
 
-This layout wraps all core application modules and includes the main sidebar and header.
+### Main Modules
 
-### Application Modules (`src/app/(app)/*`)
+-   **Dashboard**: `src/app/(app)/dashboard/page.tsx`
+-   **Inventory**: `src/app/(app)/inventory/page.tsx`
+-   **Plants**: `src/app/(app)/plants/page.tsx`
+-   **Waste Management**: `src/app/(app)/waste/page.tsx`
+-   **Reports**: `src/app/(app)/reports/page.tsx`
+-   **Profile**: `src/app/(app)/profile/page.tsx`
+-   **Billing**: `src/app/(app)/billing/page.tsx`
+-   **Settings**: `src/app/(app)/settings/page.tsx`
 
-- **`/dashboard`**: (`src/app/(app)/dashboard/page.tsx`)
-  - A role-aware, customizable command center with widgets for KPIs, alerts, timelines, and quick actions.
+### Processing Module
 
-- **Plants Module**
-  - **`/plants`**: (`src/app/(app)/plants/page.tsx`) - Unified dashboard for managing the entire plant lifecycle from germination to harvest.
+-   **Overview**: `src/app/(app)/processing/page.tsx`
+-   **Batches**: `src/app/(app)/processing/batches/page.tsx`
+-   **Drying & Curing**: `src/app/(app)/processing/drying-curing/page.tsx`
+-   **Packaging & Labeling**: `src/app/(app)/processing/packaging/page.tsx`
+-   **Recipe Management**: `src/app/(app)/processing/recipes/page.tsx`
 
-- **Processing Module**
-  - **`/processing`**: (`src/app/(app)/processing/page.tsx`) - Overview of all post-harvest operations.
-  - **`/processing/batches`**: (`src/app/(app)/processing/batches/page.tsx`) - Manage processing batches (drying, curing, extraction, etc.).
-  - **`/processing/drying-curing`**: (`src/app/(app)/processing/drying-curing/page.tsx`) - Monitor and manage drying/curing environments.
-  - **`/processing/packaging`**: (`src/app/(app)/processing/packaging/page.tsx`) - Manage packaging runs and METRC tag assignment.
-  - **`/processing/recipes`**: (`src/app/(app)/processing/recipes/page.tsx`) - Define and manage product formulas.
+### Lab Testing Module
 
-- **Lab Testing Module**
-  - **`/lab-testing`**: (`src/app/(app)/lab-testing/page.tsx`) - Dashboard for monitoring testing workflows and results.
-  - **`/lab-testing/requests`**: (`src/app/(app)/lab-testing/requests/page.tsx`) - Create and track requests for lab tests.
-  - **`/lab-testing/results`**: (`src/app/(app)/lab-testing/results/page.tsx`) - View, upload, and manage Certificates of Analysis (COAs).
+-   **Overview**: `src/app/(app)/lab-testing/page.tsx`
+-   **Test Requests**: `src/app/(app)/lab-testing/requests/page.tsx`
+-   **Results & COAs**: `src/app/(app)/lab-testing/results/page.tsx`
 
-- **Transfers Module**
-  - **`/transfers`**: (`src/app/(app)/transfers/page.tsx`) - Logistics dashboard for all product movements.
-  - **`/transfers/manifests`**: (`src/app/(app)/transfers/manifests/page.tsx`) - Create and manage METRC-compliant transfer manifests.
-  - **`/transfers/incoming`**: (`src/app/(app)/transfers/incoming/page.tsx`) - View and accept/reject incoming transfers.
-  - **`/transfers/deliveries`**: (`src/app/(app)/transfers/deliveries/page.tsx`) - Manage direct-to-customer deliveries.
-  - **`/transfers/custody`**: (`src/app/(app)/transfers/custody/page.tsx`) - View immutable chain of custody audit trails.
-  - **`/transfers/drivers-vehicles`**: (`src/app/(app)/transfers/drivers-vehicles/page.tsx`) - Manage registry of approved drivers and vehicles.
+### Transfers Module
 
-- **Sales Module**
-  - **`/sales`**: (`src/app/(app)/sales/page.tsx`) - Redirects to the POS.
-  - **`/sales/pos`**: (`src/app/(app)/sales/pos/page.tsx`) - Retail Point of Sale interface.
-  - **`/sales/records`**: (`src/app/(app)/sales/records/page.tsx`) - View sales transaction history and audit logs.
-  - **`/sales/history`**: (`src/app/(app)/sales/history/page.tsx`) - Look up purchase history for specific customers/patients.
-  - **`/sales/returns`**: (`src/app/(app)/sales/returns/page.tsx`) - Manage customer returns and refunds.
-  - **`/sales/discounts`**: (`src/app/(app)/sales/discounts/page.tsx`) - Create and manage promotions and loyalty programs.
-  - **`/sales/labels`**: (`src/app/(app)/sales/labels/page.tsx`) - Generate and print compliant product labels.
+-   **Overview**: `src/app/(app)/transfers/page.tsx`
+-   **Manifests**: `src/app/(app)/transfers/manifests/page.tsx`
+-   **Incoming Transfers**: `src/app/(app)/transfers/incoming/page.tsx`
+-   **Customer Deliveries**: `src/app/(app)/transfers/deliveries/page.tsx`
+-   **Chain of Custody**: `src/app/(app)/transfers/custody/page.tsx`
+-   **Drivers & Vehicles**: `src/app/(app)/transfers/drivers-vehicles/page.tsx`
 
-- **Medical Module**
-  - **`/medical`**: (`src/app/(app)/medical/page.tsx`) - Dashboard for medical cannabis operations.
-  - **`/medical/patients`**: (`src/app/(app)/medical/patients/page.tsx`) - Manage patient profiles, conditions, and prescriptions.
-  - **`/medical/consultations`**: (`src/app/(app)/medical/consultations/page.tsx`) - Schedule and document patient consultations.
-  - **`/medical/inventory`**: (`src/app/(app)/medical/inventory/page.tsx`) - Manage medical-only inventory with condition-based filtering.
+### Sales Module
 
-- **`/waste`**: (`src/app/(app)/waste/page.tsx`) - Manage and report cannabis waste.
-- **`/reports`**: (`src/app/(app)/reports/page.tsx`) - Interactive reports and analytics dashboard.
+-   **Overview/Redirect**: `src/app/(app)/sales/page.tsx`
+-   **Retail POS**: `src/app/(app)/sales/pos/page.tsx`
+-   **Sales Records**: `src/app/(app)/sales/records/page.tsx`
+-   **Customer History**: `src/app/(app)/sales/history/page.tsx`
+-   **Returns & Refunds**: `src/app/(app)/sales/returns/page.tsx`
+-   **Discounts & Promotions**: `src/app/(app)/sales/discounts/page.tsx`
+-   **Label Generation**: `src/app/(app)/sales/labels/page.tsx`
 
-- **User Settings**
-  - **`/profile`**: (`src/app/(app)/profile/page.tsx`) - User's personal profile management.
-  - **`/settings`**: (`src/app/(app)/settings/page.tsx`) - User-specific settings for notifications, appearance, etc.
-  - **`/billing`**: (`src/app/(app)/billing/page.tsx`) - Subscription and payment management.
+### Medical Module
 
-- **Admin Module** (`src/app/(app)/admin/*`)
-  - **`/admin`**: (`src/app/(app)/admin/page.tsx`) - Admin dashboard with links to management sections.
-  - **`/admin/facilities`**: (`src/app/(app)/admin/facilities/page.tsx`) - Manage business locations.
-  - **`/admin/licenses`**: (`src/app/(app)/admin/licenses/page.tsx`) - Manage facility licenses and METRC API keys.
-  - **`/admin/users`**: (`src/app/(app)/admin/users/page.tsx`) - Manage user accounts, roles, and permissions.
-  - **`/admin/settings`**: (`src/app/(app)/admin/settings/page.tsx`) - Manage global system settings.
+-   **Overview**: `src/app/(app)/medical/page.tsx`
+-   **Patient Profiles**: `src/app/(app)/medical/patients/page.tsx`
+-   **Consultations**: `src/app/(app)/medical/consultations/page.tsx`
+-   **Medical Inventory**: `src/app/(app)/medical/inventory/page.tsx`
 
----
+### Admin Module
 
-## 2. Reusable UI Components
-
-### Custom Application Components (`src/components/*`)
-- **`layout/app-header.tsx`**: The main header for the application view.
-- **`layout/sidebar-nav.tsx`**: The primary navigation component for the sidebar.
-- **`logo.tsx`**: The application logo component.
-- **`page-container.tsx`**: A wrapper for consistent padding and spacing on main pages.
-- **`page-header.tsx`**: A standardized header component for page titles and descriptions.
-- **`theme-provider.tsx`**: Next-themes provider for light/dark mode.
-- **`theme-toggle.tsx`**: The UI control for switching themes.
-- **`user-nav.tsx`**: The user avatar and dropdown menu in the header.
-
-### ShadCN UI Components (`src/components/ui/*`)
-- Accordion
-- Alert & Alert Dialog
-- Avatar
-- Badge
-- Button
-- Calendar
-- Card (and its sub-components)
-- Chart (and its sub-components for Recharts)
-- Checkbox
-- Dialog (Modal)
-- Dropdown Menu
-- Form
-- Input
-- Label
-- Menubar
-- Popover
-- Progress
-- Radio Group
-- Scroll Area
-- Select
-- Separator
-- Sheet
-- Sidebar (Custom component built with Sheet and other primitives)
-- Skeleton
-- Slider
-- Switch
-- Table
-- Tabs
-- Textarea
-- Toast & Toaster
-- Tooltip
+-   **Admin Layout**: `src/app/(app)/admin/layout.tsx`
+-   **Dashboard**: `src/app/(app)/admin/page.tsx`
+-   **User Management**: `src/app/(app)/admin/users/page.tsx`
+-   **Facilities**: `src/app/(app)/admin/facilities/page.tsx`
+-   **Licenses**: `src/app/(app)/admin/licenses/page.tsx`
+-   **System Settings**: `src/app/(app)/admin/settings/page.tsx`
 
 ---
 
-## 3. Custom Logic, Configuration & Hooks
+## 2. Reusable UI Components (`src/components/ui`)
 
-- **`src/lib/utils.ts`**: Contains the `cn` utility for merging Tailwind CSS classes.
-- **`src/hooks/use-toast.ts`**: Custom hook for the toast notification system.
-- **`src/hooks/use-mobile.tsx`**: Custom hook to detect if the viewport is mobile-sized.
-- **`src/config/site.ts`**: Central configuration file defining the navigation structure (mainNav, adminNav) and site metadata.
-- **`src/types/nav.ts`**: TypeScript type definitions for navigation items.
-- **`src/ai/genkit.ts`**: Configuration and initialization for the Genkit AI plugin.
-- **`src/ai/dev.ts`**: Entry point for developing and testing Genkit flows locally.
+This is an inventory of the base UI components, primarily from the ShadCN library.
 
----
-
-## 4. Routing & Site Map
-
-The site's navigation flow is defined in `src/config/site.ts` and rendered by `src/components/layout/sidebar-nav.tsx`.
-
-### Main Navigation
-- **/dashboard**
-- **/inventory**
-- **/plants**
-- **/processing**
-  - **/processing/overview** (redirects to `/processing`)
-  - **/processing/batches**
-  - **/processing/drying-curing**
-  - **/processing/packaging**
-  - **/processing/recipes**
-- **/lab-testing**
-  - **/lab-testing/overview** (redirects to `/lab-testing`)
-  - **/lab-testing/requests**
-  - **/lab-testing/results**
-- **/transfers**
-  - **/transfers/overview** (redirects to `/transfers`)
-  - **/transfers/manifests**
-  - **/transfers/incoming**
-  - **/transfers/deliveries**
-  - **/transfers/custody**
-  - **/transfers/drivers-vehicles**
-- **/sales**
-  - **/sales/pos**
-  - **/sales/records**
-  - **/sales/history**
-  - **/sales/returns**
-  - **/sales/discounts**
-  - **/sales/labels**
-- **/medical**
-  - **/medical/overview** (redirects to `/medical`)
-  - **/medical/patients**
-  - **/medical/consultations**
-  - **/medical/inventory**
-- **/waste**
-- **/reports**
-
-### Administration Navigation
-- **/admin**
-- **/admin/facilities**
-- **/admin/licenses**
-- **/admin/users**
-- **/admin/settings**
-
-### User Navigation (from Header Dropdown)
-- **/profile**
-- **/billing**
-- **/settings**
-- **/login** (for logout)
+-   `accordion.tsx`
+-   `alert-dialog.tsx`
+-   `alert.tsx`
+-   `avatar.tsx`
+-   `badge.tsx`
+-   `button.tsx`
+-   `calendar.tsx`
+-   `card.tsx`
+-   `chart.tsx`
+-   `checkbox.tsx`
+-   `dialog.tsx`
+-   `dropdown-menu.tsx`
+-   `form.tsx`
+-   `input.tsx`
+-   `label.tsx`
+-   `menubar.tsx`
+-   `popover.tsx`
+-   `progress.tsx`
+-   `radio-group.tsx`
+-   `scroll-area.tsx`
+-   `select.tsx`
+-   `separator.tsx`
+-   `sheet.tsx`
+-   `sidebar.tsx`
+-   `skeleton.tsx`
+-   `slider.tsx`
+-   `switch.tsx`
+-   `table.tsx`
+-   `tabs.tsx`
+-   `textarea.tsx`
+-   `toast.tsx`
+-   `toaster.tsx`
+-   `tooltip.tsx`
 
 ---
 
-## 5. Review & Confirmation Checklist
+## 3. Custom Components, Logic & Configuration
 
-This section is for your team to use to verify the completeness of this inventory.
+This section lists custom-built components, layout helpers, hooks, and configuration files that are specific to the TruChain application.
 
-- [ ] **List all top-level pages**: Documented in Section 1.
-- [ ] **List all reusable UI components**: Documented in Section 2.
-- [ ] **List all custom logic files/utilities**: Documented in Section 3.
-- [ ] **Draw the routing/site map showing navigation flow**: Documented in Section 4.
-- [ ] **Review the codebase with another dev/stakeholder for missed items**.
+### Custom Components & Layouts
 
-### Acceptance Criteria
-- [ ] Document exists with all pages, components, and utilities.
-- [ ] The routing/site map is included in the doc.
-- [ ] At least one other person reviews and confirms completeness.
+-   **`src/components/layout/app-header.tsx`**: Renders the main header bar across the top of the application.
+-   **`src/components/layout/sidebar-nav.tsx`**: Renders the navigation links within the main sidebar.
+-   **`src/components/logo.tsx`**: A simple component for displaying the application logo and name.
+-   **`src/components/page-container.tsx`**: A wrapper component that provides consistent padding and spacing for main page content.
+-   **`src/components/page-header.tsx`**: A component for displaying the main title and description at the top of a page.
+-   **`src/components/theme-provider.tsx`**: Wrapper for `next-themes` to handle light/dark mode.
+-   **`src/components/theme-toggle.tsx`**: The UI button for switching between light, dark, and system themes.
+-   **`src/components/user-nav.tsx`**: The user avatar dropdown menu in the header with links to profile, billing, settings, and logout.
 
-**Reviewed by:** _________________________
+### Custom Logic & Utilities
 
-**Date:** _________________________
+-   **`src/hooks/use-mobile.tsx`**: A React hook to detect if the user is on a mobile-sized screen.
+-   **`src/hooks/use-toast.ts`**: The custom hook and system for triggering toast notifications.
+-   **`src/lib/utils.ts`**: Contains the `cn` utility function for merging Tailwind CSS classes.
+-   **`src/types/nav.ts`**: TypeScript type definitions for navigation item structures.
+
+### Configuration
+
+-   **`src/config/site.ts`**: The central configuration file that defines the structure of the sidebar navigation (`mainNav` and `adminNav`).
+-   **`src/app/globals.css`**: The global CSS file containing Tailwind directives and the application's color theme variables (CSS custom properties) for light and dark modes.
+
+### AI (Genkit)
+
+-   **`src/ai/genkit.ts`**: Initializes and configures the core Genkit `ai` object with plugins (like Google AI) and a default model.
+-   **`src/ai/dev.ts`**: The development entry point for Genkit flows.
