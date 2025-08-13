@@ -91,13 +91,22 @@ type QAStatus = "Untested" | "Pass" | "Fail";
 type OnTrackStatus = "On Track" | "At Risk" | "Needs Review";
 type MetrcSyncStatus = "synced" | "error" | "pending";
 
+interface PlantLocation {
+  room_id: string,
+  row_number?: string,
+  shelf_level?: string,
+  quadrant?: string,
+}
+
 interface PlantBatch {
   id: string;
   metrcTagId: string; 
   strain: string;
   quantity: number;
   currentPhase: PlantStage;
-  roomLocation: string;
+  roomLocation: string; // Simplified for display, full object stored
+  location?: PlantLocation; // New detailed location
+  dateCreated: string; 
   phaseStartDate: string; 
   estimatedStageCompletionDate: string; 
   qaStatus: QAStatus;
@@ -107,7 +116,6 @@ interface PlantBatch {
   metrcSync: MetrcSyncStatus;
   stageProgress: number; 
   expectedHarvestDate: string; 
-  dateCreated: string; 
 }
 
 const initialPlantBatches: PlantBatch[] = [
@@ -118,6 +126,7 @@ const initialPlantBatches: PlantBatch[] = [
     currentPhase: "Flowering",
     quantity: 50,
     roomLocation: "Flower Room 1A",
+    location: { room_id: "Flower Room 1A", row_number: "Row 3", shelf_level: "Top"},
     dateCreated: "2023-09-15",
     phaseStartDate: "2023-10-20",
     estimatedStageCompletionDate: "2023-11-20",
@@ -136,6 +145,7 @@ const initialPlantBatches: PlantBatch[] = [
     currentPhase: "Vegetative",
     quantity: 120,
     roomLocation: "Veg Room 2B",
+    location: { room_id: "Veg Room 2B", row_number: "Row 1" },
     dateCreated: "2023-10-01",
     phaseStartDate: "2023-10-10",
     estimatedStageCompletionDate: "2023-11-05",
@@ -190,6 +200,7 @@ const initialPlantBatches: PlantBatch[] = [
     currentPhase: "Flowering",
     quantity: 70,
     roomLocation: "Flower Room 2A",
+    location: { room_id: "Flower Room 2A", row_number: "Row 5"},
     dateCreated: "2023-07-15",
     phaseStartDate: "2023-09-01",
     estimatedStageCompletionDate: "2023-10-20", 
@@ -312,6 +323,7 @@ export default function PlantsLifecycleDashboardPage() {
       toast({ title: "Success", description: `Batch ${selectedBatch?.id} stage advanced.` });
       setShowAdvanceStageModal(false);
     } else if (modalType === "logActivity") {
+      // TODO: Call logPlantActivity(selectedBatch.id, activityData)
       toast({ title: "Success", description: `Activity logged for Batch ${selectedBatch?.id}.` });
       setShowLogActivityModal(false);
     } else if (modalType === "harvest") {
@@ -323,8 +335,13 @@ export default function PlantsLifecycleDashboardPage() {
       toast({ title: "Success", description: `Batch ${selectedBatch?.id} marked for destruction.` });
       setShowDestroyModal(false);
     } else if (modalType === "archive") {
+      // TODO: Call archivePlantBatch(selectedBatch.id)
       toast({ title: "Success", description: `Batch ${selectedBatch?.id} archived.` });
       setShowArchiveModal(false);
+    } else if (modalType === "move") {
+      // TODO: Call movePlantBatch(selectedBatch.id, newLocationData) which creates a plant_location_logs entry
+      toast({ title: "Success", description: `Batch ${selectedBatch?.id} moved.` });
+      setShowMoveModal(false);
     }
      // Add other modal submit handlers here
     setSelectedBatch(null);
@@ -703,7 +720,25 @@ export default function PlantsLifecycleDashboardPage() {
       <Dialog open={showFlagHealthModal} onOpenChange={setShowFlagHealthModal}><DialogContent><DialogHeader><DialogTitle>Flag Health Concern for {selectedBatch?.id}</DialogTitle></DialogHeader><Textarea placeholder="Health concern details..."/><DialogFooter><Button variant="outline" onClick={()=>setShowFlagHealthModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Flagged"}); setShowFlagHealthModal(false);}}>Flag</Button></DialogFooter></DialogContent></Dialog>
       <Dialog open={showUploadQAModal} onOpenChange={setShowUploadQAModal}><DialogContent><DialogHeader><DialogTitle>Upload Lab QA Results for {selectedBatch?.id}</DialogTitle></DialogHeader><Input type="file"/><DialogFooter><Button variant="outline" onClick={()=>setShowUploadQAModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Uploaded"}); setShowUploadQAModal(false);}}>Upload</Button></DialogFooter></DialogContent></Dialog>
       <Dialog open={showCloneModal} onOpenChange={setShowCloneModal}><DialogContent><DialogHeader><DialogTitle>Clone Batch {selectedBatch?.id}</DialogTitle></DialogHeader><Input placeholder="New Batch Name/ID Prefix"/><DialogFooter><Button variant="outline" onClick={()=>setShowCloneModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Cloned"}); setShowCloneModal(false);}}>Clone</Button></DialogFooter></DialogContent></Dialog>
-      <Dialog open={showMoveModal} onOpenChange={setShowMoveModal}><DialogContent><DialogHeader><DialogTitle>Move Plants for Batch {selectedBatch?.id}</DialogTitle></DialogHeader><Input placeholder="New Location"/><DialogFooter><Button variant="outline" onClick={()=>setShowMoveModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Moved"}); setShowMoveModal(false);}}>Move</Button></DialogFooter></DialogContent></Dialog>
+      
+      {/* Move Plants Modal */}
+      <Dialog open={showMoveModal} onOpenChange={setShowMoveModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Move Plants for Batch {selectedBatch?.id}</DialogTitle>
+            <DialogDescription>Log the movement of plants to a new location. This will create an audit trail entry.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-3">
+             <div><Label htmlFor="move-from">From Location</Label><Input id="move-from" disabled defaultValue={selectedBatch?.roomLocation} /></div>
+             <div><Label htmlFor="move-to">To New Location (Room)</Label><Input id="move-to" placeholder="e.g., Flower Room 2B"/></div>
+             <div><Label htmlFor="move-reason">Reason for Move (Optional)</Label><Textarea id="move-reason" placeholder="e.g., Transitioning to flowering stage." rows={2} /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowMoveModal(false)}>Cancel</Button>
+            <Button onClick={() => handleSubmitModal("move")}>Confirm Move</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
 
     </PageContainer>

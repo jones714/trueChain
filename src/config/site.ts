@@ -32,6 +32,7 @@ import {
   Percent,
   History,
   PackageCheck,
+  Map,
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -61,8 +62,11 @@ export const siteConfig: SiteConfig = {
     },
     {
       title: "Plants",
-      href: "/plants", 
       icon: Sprout,
+      items: [
+        { title: "Lifecycle Dashboard", href: "/plants", icon: Sprout },
+        { title: "Grow Rooms", href: "/plants/rooms", icon: Map },
+      ],
     },
     {
       title: "Processing",
