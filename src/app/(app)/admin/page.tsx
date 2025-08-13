@@ -4,7 +4,7 @@ import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Building, BadgeCheck, Settings, Activity, ShieldCheck, Workflow, MapPin, History } from "lucide-react";
+import { Users, Building, BadgeCheck, Settings, Activity, ShieldCheck, Workflow, MapPin, History, Fingerprint } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboardPage() {
@@ -74,6 +74,17 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">Review a complete audit trail of all scan events (METRC, QR, barcode).</p>
+            </CardContent>
+          </Card>
+        </Link>
+         <Link href="/admin/age-verification-logs" passHref>
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-base font-semibold">Age Verification Logs</CardTitle>
+              <Fingerprint className="h-5 w-5 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">Audit all age verification checks from POS, delivery, and online sales.</p>
             </CardContent>
           </Card>
         </Link>

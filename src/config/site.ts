@@ -33,6 +33,7 @@ import {
   History,
   PackageCheck,
   Map,
+  Fingerprint,
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -86,6 +87,7 @@ export const siteConfig: SiteConfig = {
         { title: "Overview", href: "/lab-testing", icon: FlaskConical },
         { title: "Test Requests", href: "/lab-testing/requests", icon: FileText },
         { title: "Results & COAs", href: "/lab-testing/results", icon: BadgeCheck },
+        { title: "Test Logs", href: "/lab-testing/logs", icon: History },
       ],
     },
     {
@@ -163,6 +165,11 @@ export const siteConfig: SiteConfig = {
       title: "Scan History",
       href: "/admin/scan-logs",
       icon: History,
+    },
+     {
+      title: "Age Verification Logs",
+      href: "/admin/age-verification-logs",
+      icon: Fingerprint,
     },
   ],
 };
