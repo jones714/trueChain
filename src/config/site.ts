@@ -34,6 +34,7 @@ import {
   PackageCheck,
   Map,
   Fingerprint,
+  Megaphone,
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -155,6 +156,11 @@ export const siteConfig: SiteConfig = {
       title: "User Management",
       href: "/admin/users",
       icon: Users,
+    },
+     {
+      title: "Recalls",
+      href: "/admin/recalls",
+      icon: Megaphone,
     },
     {
       title: "System Settings",
