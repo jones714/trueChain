@@ -18,8 +18,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlusCircle, Trash2, CalendarPlus, Download, UploadCloud, Edit, FileTextIcon, BarChartHorizontalBig, Filter, AlertTriangle, CheckCircle, Clock, CameraIcon, UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
-// Dummy data for waste logs
+// Updated dummy data to reflect a more detailed schema
 const wasteLogsData = [
   { id: "WST001", metrcTag: "1A4060300000E0E000000123", type: "Plant Material", source: "Harvest HVT-005", initialWeight: "5.2 kg", finalWeight: "5.15 kg", loggedBy: "Alice W.", dateLogged: "2023-10-25", status: "Awaiting Destruction", destructionMethod: "Grinding & Mixing", scheduledDestruction: "2023-11-01", proofAvailable: true, witness: "Security Guard #1" },
   { id: "WST002", metrcTag: "1A4060300000E0E000000124", type: "Expired Product", source: "Batch PRD-072", initialWeight: "0.8 kg", finalWeight: "0.78 kg", loggedBy: "Bob B.", dateLogged: "2023-10-26", status: "Destruction Overdue", destructionMethod: "Incineration", scheduledDestruction: "2023-10-28", proofAvailable: false, witness: "Jane D." },
@@ -33,6 +39,22 @@ const scheduledDestructionsData = [
 
 
 export default function WasteManagementPage() {
+  const { toast } = useToast();
+  const [showLogWasteModal, setShowLogWasteModal] = useState(false);
+  const [showScheduleDestructionModal, setShowScheduleDestructionModal] = useState(false);
+
+  const handleLogWasteRecord = () => {
+    // TODO: Call logWasteRecord(data)
+    toast({ title: "Waste Logged", description: "New waste record created successfully." });
+    setShowLogWasteModal(false);
+  };
+
+  const handleScheduleDestruction = () => {
+    // TODO: Call scheduleDestructionEvent(data)
+    toast({ title: "Destruction Scheduled", description: "New destruction event has been scheduled." });
+    setShowScheduleDestructionModal(false);
+  };
+
   return (
     <PageContainer>
       <PageHeader 
@@ -40,13 +62,13 @@ export default function WasteManagementPage() {
         description="Track, manage, and report cannabis waste (plant, product, chemical) from seed-to-sale. Ensure full regulatory compliance with METRC tag association, destruction method tracking, before/after weights, chain-of-custody (staff, time, location), photo/video proof, and witness logs. Auto-generates destruction logs and supports audit exports."
       >
         <div className="flex flex-wrap gap-2">
-          <Button>
+          <Button onClick={() => setShowLogWasteModal(true)}>
             <PlusCircle className="mr-2 h-4 w-4" /> Add New Waste Record
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => setShowScheduleDestructionModal(true)}>
             <CalendarPlus className="mr-2 h-4 w-4" /> Schedule Destruction Event
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => toast({title: "Exporting Logs", description: "Generating CSV/PDF of waste logs."})}>
             <Download className="mr-2 h-4 w-4" /> Export Logs (CSV/PDF)
           </Button>
         </div>
@@ -156,13 +178,13 @@ export default function WasteManagementPage() {
                         {log.proofAvailable ? <CameraIcon className="h-5 w-5 text-primary" title="Proof Available"/> : <CameraIcon className="h-5 w-5 text-muted-foreground opacity-50" title="No Proof Uploaded"/>}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" title="Upload Proof/Photo/Video">
+                        <Button variant="ghost" size="icon" title="Upload Proof/Photo/Video" onClick={() => toast({title: "Action", description: "Open file upload for " + log.id})}>
                           <UploadCloud className="h-4 w-4"/>
                         </Button>
-                        <Button variant="ghost" size="icon" title="Record Destruction Details">
+                        <Button variant="ghost" size="icon" title="Record Destruction Details" onClick={() => toast({title: "Action", description: "Open modal to finalize destruction for " + log.id})}>
                           <Edit className="h-4 w-4" />
                         </Button>
-                         <Button variant="ghost" size="icon" title="View Details">
+                         <Button variant="ghost" size="icon" title="View Details" onClick={() => toast({title: "Action", description: "Routing to details page for " + log.id})}>
                           <FileTextIcon className="h-4 w-4" />
                         </Button>
                       </TableCell>
@@ -214,7 +236,7 @@ export default function WasteManagementPage() {
                            <Badge variant={event.status === "Completed" ? "default" : "secondary"}>{event.status}</Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                            <Button variant="outline" size="sm">Start Event / Log Details</Button>
+                            <Button variant="outline" size="sm" onClick={() => toast({title: "Action", description: "Opening details for event " + event.id})}>Start Event / Log Details</Button>
                             <Button variant="ghost" size="sm" className="ml-2">View Details</Button>
                         </TableCell>
                      </TableRow>
@@ -235,25 +257,111 @@ export default function WasteManagementPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>Compliance & Reporting</CardTitle>
-                    <CardDescription>Generate destruction logs, view audit trails, and manage state reporting integration.</CardDescription>
+                    <CardDescription>Generate destruction logs, view audit trails, and manage state reporting integration. Role-based access ensures only authorized personnel (e.g., Compliance Manager) can perform critical actions.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="p-4 border rounded-lg">
                         <h3 className="font-semibold text-md">Destruction Logs & Audit Trails</h3>
                         <p className="text-sm text-muted-foreground mt-1">Auto-generate compliant destruction logs. Maintain a full audit trail for all waste activities, including chain-of-custody (staff, time, location, witness, photo/video proof).</p>
-                        <Button variant="default" className="mt-3">Generate Destruction Log (PDF/CSV)</Button>
-                        <Button variant="outline" className="mt-3 ml-2">View Full Audit Trail</Button>
+                        <Button variant="default" className="mt-3" onClick={() => toast({title: "Report Generated", description:"PDF/CSV destruction log generated."})}>Generate Destruction Log (PDF/CSV)</Button>
+                        <Button variant="outline" className="mt-3 ml-2" onClick={() => toast({title: "Navigating", description:"Opening full audit trail."})}>View Full Audit Trail</Button>
                     </div>
                      <div className="p-4 border rounded-lg">
                         <h3 className="font-semibold text-md">State Reporting Integration</h3>
                         <p className="text-sm text-muted-foreground mt-1">Configure and manage integration with state waste reporting systems (e.g., METRC) for automated data submission where applicable.</p>
                         <Button variant="outline" className="mt-3" disabled>Configure State Integration (Future)</Button>
                     </div>
-                    <p className="text-xs text-muted-foreground">Role-based access controls ensure data integrity and security for all waste management operations.</p>
+                    <p className="text-xs text-muted-foreground">Role-based access controls (e.g. Grower, Inventory Tech, Compliance Manager) ensure data integrity and security for all waste management operations.</p>
                 </CardContent>
             </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Log Waste Modal */}
+      <Dialog open={showLogWasteModal} onOpenChange={setShowLogWasteModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Log New Waste Record</DialogTitle>
+            <DialogDescription>
+              Create a new waste entry. Scan or select source item.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div>
+              <Label htmlFor="waste-source">Source (Scan METRC or Batch ID)</Label>
+              <Input id="waste-source" placeholder="e.g., 1A40603..." />
+            </div>
+            <div>
+              <Label htmlFor="waste-type">Waste Type</Label>
+              <Select>
+                <SelectTrigger><SelectValue placeholder="Select type..."/></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="biological">Biological (Plant Material)</SelectItem>
+                  <SelectItem value="packaging">Packaging</SelectItem>
+                  <SelectItem value="chemical">Chemical</SelectItem>
+                  <SelectItem value="expired_product">Expired Product</SelectItem>
+                  <SelectItem value="misc">Mixed/Miscellaneous</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="waste-reason">Reason</Label>
+              <Input id="waste-reason" placeholder="e.g., Mold, Expired, Spillage" />
+            </div>
+             <div>
+              <Label htmlFor="waste-weight">Weight (lbs or kg)</Label>
+              <Input id="waste-weight" type="number" placeholder="e.g., 5.2" />
+            </div>
+             <div>
+              <Label htmlFor="waste-method">Disposal Method</Label>
+              <Input id="waste-method" placeholder="e.g., Rendered unusable" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowLogWasteModal(false)}>Cancel</Button>
+            <Button onClick={handleLogWasteRecord}>Log Waste</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Schedule Destruction Modal */}
+      <Dialog open={showScheduleDestructionModal} onOpenChange={setShowScheduleDestructionModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Schedule New Destruction Event</DialogTitle>
+            <DialogDescription>
+              Plan a bulk destruction event for one or more waste records.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+             <div>
+              <Label htmlFor="dest-date">Scheduled Date & Time</Label>
+              <Input id="dest-date" type="datetime-local" />
+            </div>
+             <div>
+              <Label htmlFor="dest-location">Location</Label>
+              <Input id="dest-location" placeholder="e.g., Destruction Area A" />
+            </div>
+             <div>
+              <Label htmlFor="dest-method">Default Method</Label>
+              <Input id="dest-method" placeholder="e.g., Grinding and Mixing" />
+            </div>
+             <div>
+              <Label htmlFor="dest-staff">Assigned Staff & Witnesses</Label>
+              <Textarea id="dest-staff" placeholder="List names of personnel..." />
+            </div>
+             <div>
+              <Label htmlFor="dest-waste-ids">Waste Record IDs to Include</Label>
+              <Textarea id="dest-waste-ids" placeholder="e.g., WST001, WST002" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowScheduleDestructionModal(false)}>Cancel</Button>
+            <Button onClick={handleScheduleDestruction}>Schedule Event</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </PageContainer>
   );
 }
