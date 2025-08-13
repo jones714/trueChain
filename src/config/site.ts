@@ -31,7 +31,7 @@ import {
   RotateCcw,
   Percent,
   History,
-  PackageCheck, // Added for Customer Deliveries
+  PackageCheck,
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -154,6 +154,11 @@ export const siteConfig: SiteConfig = {
       title: "System Settings",
       href: "/admin/settings",
       icon: Settings,
+    },
+    {
+      title: "Scan History",
+      href: "/admin/scan-logs",
+      icon: History,
     },
   ],
 };

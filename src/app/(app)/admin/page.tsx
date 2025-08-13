@@ -1,16 +1,17 @@
 
+
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Building, BadgeCheck, Settings, Activity, ShieldCheck, Workflow, MapPin } from "lucide-react";
+import { Users, Building, BadgeCheck, Settings, Activity, ShieldCheck, Workflow, MapPin, History } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboardPage() {
   return (
     <PageContainer>
       <PageHeader title="Admin Dashboard" description="Manage system settings, users, facilities, and more." />
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Link href="/admin/users" passHref>
           <Card className="hover:shadow-md transition-shadow cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -65,6 +66,17 @@ export default function AdminDashboardPage() {
                <Button variant="link" className="p-0 h-auto text-primary text-xs mt-2">View Logs</Button>
             </CardContent>
         </Card>
+         <Link href="/admin/scan-logs" passHref>
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-base font-semibold">Scan History</CardTitle>
+              <History className="h-5 w-5 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">Review a complete audit trail of all scan events (METRC, QR, barcode).</p>
+            </CardContent>
+          </Card>
+        </Link>
          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-base font-semibold">Security &amp; Compliance</CardTitle>
