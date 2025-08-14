@@ -73,7 +73,7 @@ import {
   Clock,
   Wind,
   Sun,
-  Ph,
+  Beaker,
   Droplet,
   Gauge,
   Calendar,
@@ -639,7 +639,7 @@ export default function PlantsLifecycleDashboardPage() {
                 <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium">VPD</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">1.2 <span className="text-lg">kPa</span></p><p className="text-xs text-green-600">Optimal</p></CardContent></Card>
                 <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Sun className="mr-1"/>Light (PPFD)</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">950</p><p className="text-xs text-green-600">Optimal</p></CardContent></Card>
                 <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Droplet className="mr-1"/>Soil Moisture</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">45%</p><p className="text-xs text-green-600">Optimal</p></CardContent></Card>
-                <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Ph className="mr-1"/>Reservoir pH</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">6.1</p><p className="text-xs text-yellow-600">Acceptable</p></CardContent></Card>
+                <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Beaker className="mr-1"/>Reservoir pH</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">6.1</p><p className="text-xs text-yellow-600">Acceptable</p></CardContent></Card>
                 <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Gauge className="mr-1"/>Reservoir EC</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">1.8</p><p className="text-xs text-green-600">Optimal</p></CardContent></Card>
             </div>
 
@@ -841,3 +841,6 @@ export default function PlantsLifecycleDashboardPage() {
 }
     
 
+
+
+    
