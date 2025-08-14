@@ -88,7 +88,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isPast, differenceInDays } from 'date-fns';
 import { useToast } from "@/hooks/use-toast";
@@ -243,6 +243,148 @@ const onTrackStatusColors: Record<OnTrackStatus, string> = {
   "Needs Review": "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
 };
 
+// Component for rendering a single table row to handle client-side state
+function PlantBatchRow({ batch }: { batch: PlantBatch }) {
+  const [daysInCurrentStage, setDaysInCurrentStage] = useState<number | null>(null);
+
+  useEffect(() => {
+    // This effect runs only on the client, after hydration
+    setDaysInCurrentStage(differenceInDays(new Date(), parseISO(batch.phaseStartDate)));
+  }, [batch.phaseStartDate]);
+
+  const StageIcon = stageIcons[batch.currentPhase] || Sprout;
+  const QAIcon = qaStatusIcons[batch.qaStatus] || ShieldQuestion;
+  const isOverdue = batch.currentPhase !== 'Harvested' && batch.currentPhase !== 'Destroyed' && isPast(parseISO(batch.expectedHarvestDate));
+
+  // These actions would be passed down as props or handled by context in a real app
+  const { toast } = useToast();
+  const [showAdvanceStageModal, setShowAdvanceStageModal] = useState(false);
+  const [showLogActivityModal, setShowLogActivityModal] = useState(false);
+  const [showLogNutrientModal, setShowLogNutrientModal] = useState(false);
+  const [showFlagHealthModal, setShowFlagHealthModal] = useState(false);
+  const [showUploadQAModal, setShowUploadQAModal] = useState(false);
+  const [showHarvestModal, setShowHarvestModal] = useState(false);
+  const [showCloneModal, setShowCloneModal] = useState(false);
+  const [showMoveModal, setShowMoveModal] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [showDestroyModal, setShowDestroyModal] = useState(false);
+  
+  const handleRowAction = (action: string) => {
+    if (action === "advanceStage") setShowAdvanceStageModal(true);
+    else if (action === "logActivity") setShowLogActivityModal(true);
+    else if (action === "logNutrient") setShowLogNutrientModal(true);
+    else if (action === "flagHealth") setShowFlagHealthModal(true);
+    else if (action === "uploadQA") setShowUploadQAModal(true);
+    else if (action === "harvest") setShowHarvestModal(true);
+    else if (action === "clone") setShowCloneModal(true);
+    else if (action === "move") setShowMoveModal(true);
+    else if (action === "archive") setShowArchiveModal(true);
+    else if (action === "destroy") setShowDestroyModal(true);
+    else if (action === "printTags") {
+         toast({ title: "Action", description: `Printing tags for Batch ID: ${batch.id}` });
+    }
+  };
+  
+  const handleSubmitModal = (modalType: string) => {
+    toast({ title: "Success", description: `${modalType} action for ${batch.id} completed.` });
+    setShowAdvanceStageModal(false);
+    setShowLogActivityModal(false);
+    setShowHarvestModal(false);
+    setShowDestroyModal(false);
+    setShowArchiveModal(false);
+    setShowMoveModal(false);
+  };
+
+
+  return (
+    <>
+    <TableRow className={cn(isOverdue && "bg-amber-50 dark:bg-amber-900/30")}>
+      <TableCell className="font-medium hover:underline cursor-pointer" title={`METRC Tag: ${batch.metrcTagId}`}>
+        {batch.id} {batch.hasNotes && <MessageSquare className="inline h-3 w-3 ml-1 text-blue-500"/>}
+      </TableCell>
+      <TableCell>{batch.strain}</TableCell>
+      <TableCell>{batch.quantity}</TableCell>
+      <TableCell>
+        <Badge variant="outline" className="flex items-center gap-1 whitespace-nowrap">
+            <StageIcon className="h-3.5 w-3.5" /> 
+            {batch.currentPhase}
+        </Badge>
+        <Progress value={batch.stageProgress} className="h-1.5 mt-1" />
+      </TableCell>
+      <TableCell>{batch.roomLocation}</TableCell>
+      <TableCell>{daysInCurrentStage !== null ? `${daysInCurrentStage}d` : '...'}</TableCell>
+      <TableCell>
+        {format(parseISO(batch.estimatedStageCompletionDate), "MM/dd/yy")}
+        {isOverdue && <AlertTriangle className="inline h-4 w-4 ml-1 text-amber-500" title="Harvest Overdue!" />}
+      </TableCell>
+      <TableCell>
+        <Badge variant={batch.qaStatus === 'Pass' ? 'default' : batch.qaStatus === 'Fail' ? 'destructive' : 'secondary'} 
+               className={cn(
+                batch.qaStatus === 'Pass' && "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+                batch.qaStatus === 'Untested' && "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300", 
+                batch.qaStatus === 'Fail' && "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" 
+               )}
+        >
+            <QAIcon className="h-3.5 w-3.5 mr-1"/>{batch.qaStatus}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        <Badge 
+            variant="outline" 
+            className={cn("whitespace-nowrap", onTrackStatusColors[batch.onTrackStatus])}
+        >
+            {batch.onTrackStatus === "On Track" && <TrendingUp className="h-3.5 w-3.5 mr-1"/>}
+            {batch.onTrackStatus === "At Risk" && <TrendingDown className="h-3.5 w-3.5 mr-1"/>}
+            {batch.onTrackStatus === "Needs Review" && <Eye className="h-3.5 w-3.5 mr-1"/>}
+            {batch.onTrackStatus}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        {batch.metrcSync === "synced" ? <CheckCircle2 className="h-5 w-5 text-green-500" title="Synced"/> : 
+         batch.metrcSync === "error" ? <AlertTriangle className="h-5 w-5 text-destructive" title="Sync Error"/> :
+         <Clock className="h-5 w-5 text-yellow-500" title="Sync Pending"/>}
+      </TableCell>
+      <TableCell className="text-right">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions for {batch.id}</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => handleRowAction("viewDetails")}><Eye className="mr-2 h-4 w-4" />View Details / Logs</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRowAction("advanceStage")}><Sprout className="mr-2 h-4 w-4" />Advance Stage</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRowAction("logActivity")}><FileEdit className="mr-2 h-4 w-4" />Log Activity/Observation</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRowAction("logNutrient")}><Wrench className="mr-2 h-4 w-4" />Log Nutrients/Watering</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRowAction("flagHealth")}><Bug className="mr-2 h-4 w-4" />Flag Health Concern</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRowAction("uploadQA")}><UploadCloud className="mr-2 h-4 w-4" />Upload Lab QA Results</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRowAction("harvest")}><ClipboardList className="mr-2 h-4 w-4" />Log Harvest & Yield</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleRowAction("clone")}><GitFork className="mr-2 h-4 w-4" />Clone Batch</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRowAction("move")}><Move className="mr-2 h-4 w-4" />Move Plants</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRowAction("printTags")}><Printer className="mr-2 h-4 w-4" />Print Tags</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleRowAction("archive")}><Archive className="mr-2 h-4 w-4" />Archive Batch</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive hover:!text-destructive focus:!text-destructive focus:!bg-destructive/10" onClick={() => handleRowAction("destroy")}>
+              <Trash2 className="mr-2 h-4 w-4" />Destroy Batch
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
+    <Dialog open={showAdvanceStageModal} onOpenChange={setShowAdvanceStageModal}><DialogContent><DialogHeader><DialogTitle>Advance Stage</DialogTitle></DialogHeader><DialogFooter><Button onClick={() => handleSubmitModal('advanceStage')}>Confirm</Button></DialogFooter></DialogContent></Dialog>
+    <Dialog open={showLogActivityModal} onOpenChange={setShowLogActivityModal}><DialogContent><DialogHeader><DialogTitle>Log Activity</DialogTitle></DialogHeader><DialogFooter><Button onClick={() => handleSubmitModal('logActivity')}>Save</Button></DialogFooter></DialogContent></Dialog>
+    <Dialog open={showHarvestModal} onOpenChange={setShowHarvestModal}><DialogContent><DialogHeader><DialogTitle>Log Harvest</DialogTitle></DialogHeader><DialogFooter><Button onClick={() => handleSubmitModal('harvest')}>Save</Button></DialogFooter></DialogContent></Dialog>
+    <Dialog open={showDestroyModal} onOpenChange={setShowDestroyModal}><DialogContent><DialogHeader><DialogTitle>Destroy Batch</DialogTitle></DialogHeader><DialogFooter><Button onClick={() => handleSubmitModal('destroy')}>Confirm</Button></DialogFooter></DialogContent></Dialog>
+    <Dialog open={showArchiveModal} onOpenChange={setShowArchiveModal}><DialogContent><DialogHeader><DialogTitle>Archive Batch</DialogTitle></DialogHeader><DialogFooter><Button onClick={() => handleSubmitModal('archive')}>Confirm</Button></DialogFooter></DialogContent></Dialog>
+    <Dialog open={showMoveModal} onOpenChange={setShowMoveModal}><DialogContent><DialogHeader><DialogTitle>Move Plants</DialogTitle></DialogHeader><DialogFooter><Button onClick={() => handleSubmitModal('move')}>Confirm</Button></DialogFooter></DialogContent></Dialog>
+    {/* Add other simple modals here */}
+    </>
+  );
+}
+
 
 export default function PlantsLifecycleDashboardPage() {
   const { toast } = useToast();
@@ -254,17 +396,6 @@ export default function PlantsLifecycleDashboardPage() {
   const [activeFilter, setActiveFilter] = useState('all_activity');
 
   const [showCreateBatchModal, setShowCreateBatchModal] = useState(false);
-  const [showAdvanceStageModal, setShowAdvanceStageModal] = useState(false);
-  const [showLogActivityModal, setShowLogActivityModal] = useState(false);
-  const [showLogNutrientModal, setShowLogNutrientModal] = useState(false);
-  const [showFlagHealthModal, setShowFlagHealthModal] = useState(false);
-  const [showUploadQAModal, setShowUploadQAModal] = useState(false);
-  const [showHarvestModal, setShowHarvestModal] = useState(false);
-  const [showCloneModal, setShowCloneModal] = useState(false);
-  const [showMoveModal, setShowMoveModal] = useState(false);
-  const [showArchiveModal, setShowArchiveModal] = useState(false);
-  const [showDestroyModal, setShowDestroyModal] = useState(false);
-  const [selectedBatch, setSelectedBatch] = useState<PlantBatch | null>(null);
   const [showSensorDashboardModal, setShowSensorDashboardModal] = useState(false);
 
 
@@ -294,69 +425,14 @@ export default function PlantsLifecycleDashboardPage() {
     });
   }, [searchTerm, stageFilter, strainFilter, locationFilter, qaStatusFilter, activeFilter]);
   
-  const getDaysInStage = (phaseStartDate: string): number => {
-    return differenceInDays(new Date(), parseISO(phaseStartDate));
-  };
-
-  const isHarvestDateOverdue = (batch: PlantBatch): boolean => {
-    return batch.currentPhase !== 'Harvested' && batch.currentPhase !== 'Destroyed' && isPast(parseISO(batch.expectedHarvestDate));
-  };
-
+  
   const handleCreateBatch = () => {
     // TODO: Call createPlantBatch(data)
     console.log("Creating batch...");
     toast({ title: "Success", description: "Plant batch created successfully." });
     setShowCreateBatchModal(false);
   };
-
-  const handleRowAction = (action: string, batch: PlantBatch) => {
-    setSelectedBatch(batch);
-    if (action === "advanceStage") setShowAdvanceStageModal(true);
-    else if (action === "logActivity") setShowLogActivityModal(true);
-    else if (action === "logNutrient") setShowLogNutrientModal(true);
-    else if (action === "flagHealth") setShowFlagHealthModal(true);
-    else if (action === "uploadQA") setShowUploadQAModal(true);
-    else if (action === "harvest") setShowHarvestModal(true);
-    else if (action === "clone") setShowCloneModal(true);
-    else if (action === "move") setShowMoveModal(true);
-    else if (action === "archive") setShowArchiveModal(true);
-    else if (action === "destroy") setShowDestroyModal(true);
-    else if (action === "printTags") {
-         toast({ title: "Action", description: `Printing tags for Batch ID: ${batch.id}` });
-    }
-  };
   
-  const handleSubmitModal = (modalType: string) => {
-    // Conceptual backend calls
-    if (modalType === "advanceStage") {
-      // TODO: Call updatePlantBatchStage(selectedBatch.id, newStage)
-      toast({ title: "Success", description: `Batch ${selectedBatch?.id} stage advanced.` });
-      setShowAdvanceStageModal(false);
-    } else if (modalType === "logActivity") {
-      // TODO: Call logPlantActivity(selectedBatch.id, activityData)
-      toast({ title: "Success", description: `Activity logged for Batch ${selectedBatch?.id}.` });
-      setShowLogActivityModal(false);
-    } else if (modalType === "harvest") {
-      // TODO: Call harvestPlantBatch(selectedBatch.id, data)
-      toast({ title: "Success", description: `Batch ${selectedBatch?.id} harvested.` });
-      setShowHarvestModal(false);
-    } else if (modalType === "destroy") {
-      // TODO: Call destroyPlantBatch(selectedBatch.id, reason)
-      toast({ title: "Success", description: `Batch ${selectedBatch?.id} marked for destruction.` });
-      setShowDestroyModal(false);
-    } else if (modalType === "archive") {
-      // TODO: Call archivePlantBatch(selectedBatch.id)
-      toast({ title: "Success", description: `Batch ${selectedBatch?.id} archived.` });
-      setShowArchiveModal(false);
-    } else if (modalType === "move") {
-      // TODO: Call movePlantBatch(selectedBatch.id, newLocationData) which creates a plant_location_logs entry
-      toast({ title: "Success", description: `Batch ${selectedBatch?.id} moved.` });
-      setShowMoveModal(false);
-    }
-     // Add other modal submit handlers here
-    setSelectedBatch(null);
-  };
-
 
   return (
     <PageContainer>
@@ -449,90 +525,9 @@ export default function PlantsLifecycleDashboardPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredPlantBatches.map((batch) => {
-                const StageIcon = stageIcons[batch.currentPhase] || Sprout;
-                const QAIcon = qaStatusIcons[batch.qaStatus] || ShieldQuestion;
-                const isOverdue = isHarvestDateOverdue(batch);
-                const daysInCurrentStage = getDaysInStage(batch.phaseStartDate);
-
-                return (
-                <TableRow key={batch.id} className={cn(isOverdue && "bg-amber-50 dark:bg-amber-900/30")}>
-                  <TableCell className="font-medium hover:underline cursor-pointer" title={`METRC Tag: ${batch.metrcTagId}`}>
-                    {batch.id} {batch.hasNotes && <MessageSquare className="inline h-3 w-3 ml-1 text-blue-500"/>}
-                  </TableCell>
-                  <TableCell>{batch.strain}</TableCell>
-                  <TableCell>{batch.quantity}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="flex items-center gap-1 whitespace-nowrap">
-                        <StageIcon className="h-3.5 w-3.5" /> 
-                        {batch.currentPhase}
-                    </Badge>
-                    <Progress value={batch.stageProgress} className="h-1.5 mt-1" />
-                  </TableCell>
-                  <TableCell>{batch.roomLocation}</TableCell>
-                  <TableCell>{daysInCurrentStage}d</TableCell>
-                  <TableCell>
-                    {format(parseISO(batch.estimatedStageCompletionDate), "MM/dd/yy")}
-                    {isOverdue && <AlertTriangle className="inline h-4 w-4 ml-1 text-amber-500" title="Harvest Overdue!" />}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={batch.qaStatus === 'Pass' ? 'default' : batch.qaStatus === 'Fail' ? 'destructive' : 'secondary'} 
-                           className={cn(
-                            batch.qaStatus === 'Pass' && "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-                            batch.qaStatus === 'Untested' && "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300", 
-                            batch.qaStatus === 'Fail' && "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" 
-                           )}
-                    >
-                        <QAIcon className="h-3.5 w-3.5 mr-1"/>{batch.qaStatus}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                        variant="outline" 
-                        className={cn("whitespace-nowrap", onTrackStatusColors[batch.onTrackStatus])}
-                    >
-                        {batch.onTrackStatus === "On Track" && <TrendingUp className="h-3.5 w-3.5 mr-1"/>}
-                        {batch.onTrackStatus === "At Risk" && <TrendingDown className="h-3.5 w-3.5 mr-1"/>}
-                        {batch.onTrackStatus === "Needs Review" && <Eye className="h-3.5 w-3.5 mr-1"/>}
-                        {batch.onTrackStatus}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {batch.metrcSync === "synced" ? <CheckCircle2 className="h-5 w-5 text-green-500" title="Synced"/> : 
-                     batch.metrcSync === "error" ? <AlertTriangle className="h-5 w-5 text-destructive" title="Sync Error"/> :
-                     <Clock className="h-5 w-5 text-yellow-500" title="Sync Pending"/>}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions for {batch.id}</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => handleRowAction("viewDetails", batch)}><Eye className="mr-2 h-4 w-4" />View Details / Logs</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleRowAction("advanceStage", batch)}><Sprout className="mr-2 h-4 w-4" />Advance Stage</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleRowAction("logActivity", batch)}><FileEdit className="mr-2 h-4 w-4" />Log Activity/Observation</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleRowAction("logNutrient", batch)}><Wrench className="mr-2 h-4 w-4" />Log Nutrients/Watering</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleRowAction("flagHealth", batch)}><Bug className="mr-2 h-4 w-4" />Flag Health Concern</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleRowAction("uploadQA", batch)}><UploadCloud className="mr-2 h-4 w-4" />Upload Lab QA Results</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleRowAction("harvest", batch)}><ClipboardList className="mr-2 h-4 w-4" />Log Harvest & Yield</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleRowAction("clone", batch)}><GitFork className="mr-2 h-4 w-4" />Clone Batch</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleRowAction("move", batch)}><Move className="mr-2 h-4 w-4" />Move Plants</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleRowAction("printTags", batch)}><Printer className="mr-2 h-4 w-4" />Print Tags</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleRowAction("archive", batch)}><Archive className="mr-2 h-4 w-4" />Archive Batch</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive hover:!text-destructive focus:!text-destructive focus:!bg-destructive/10" onClick={() => handleRowAction("destroy", batch)}>
-                          <Trash2 className="mr-2 h-4 w-4" />Destroy Batch
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              )})}
+              {filteredPlantBatches.map((batch) => (
+                <PlantBatchRow key={batch.id} batch={batch} />
+              ))}
               {filteredPlantBatches.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={11} className="h-24 text-center">
@@ -717,125 +712,6 @@ export default function PlantsLifecycleDashboardPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Advance Stage Modal */}
-      <Dialog open={showAdvanceStageModal} onOpenChange={setShowAdvanceStageModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Advance Stage for Batch {selectedBatch?.id}</DialogTitle>
-            <DialogDescription>Current Stage: {selectedBatch?.currentPhase}</DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <Label htmlFor="new-stage">New Stage</Label>
-            <Select>
-                <SelectTrigger id="new-stage"><SelectValue placeholder="Select new stage..." /></SelectTrigger>
-                <SelectContent>
-                    {selectedBatch?.currentPhase === "Germination" && <SelectItem value="Vegetative">Vegetative</SelectItem>}
-                    {selectedBatch?.currentPhase === "Vegetative" && <SelectItem value="Flowering">Flowering</SelectItem>}
-                    {selectedBatch?.currentPhase === "Flowering" && <SelectItem value="Harvested">Harvested (Log Yield)</SelectItem>}
-                </SelectContent>
-            </Select>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAdvanceStageModal(false)}>Cancel</Button>
-            <Button onClick={() => handleSubmitModal("advanceStage")}>Advance Stage</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-       {/* Log Harvest Modal */}
-      <Dialog open={showHarvestModal} onOpenChange={setShowHarvestModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Log Harvest for Batch {selectedBatch?.id}</DialogTitle>
-            <DialogDescription>Record yield and other harvest details.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="harvest-date" className="text-right">Harvest Date</Label>
-              <Input id="harvest-date" type="date" defaultValue={new Date().toISOString().split('T')[0]} className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="wet-weight" className="text-right">Wet Weight (g)</Label>
-              <Input id="wet-weight" type="number" placeholder="e.g., 2500" className="col-span-3" />
-            </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="dry-weight" className="text-right">Dry Weight (g)</Label>
-              <Input id="dry-weight" type="number" placeholder="e.g., 500 (if known)" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="harvest-notes" className="text-right">Notes</Label>
-              <Textarea id="harvest-notes" placeholder="Optional harvest notes..." className="col-span-3" />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowHarvestModal(false)}>Cancel</Button>
-            <Button onClick={() => handleSubmitModal("harvest")}>Log Harvest</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Destroy Batch Modal */}
-      <Dialog open={showDestroyModal} onOpenChange={setShowDestroyModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Destroy Batch {selectedBatch?.id}</DialogTitle>
-            <DialogDescription>This action is irreversible and will be logged.</DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <Label htmlFor="destroy-reason">Reason for Destruction</Label>
-            <Textarea id="destroy-reason" placeholder="Enter reason..." />
-             <Label htmlFor="destroy-witness" className="mt-2">Witness Name</Label>
-            <Input id="destroy-witness" placeholder="Enter witness name" />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDestroyModal(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={() => handleSubmitModal("destroy")}>Confirm Destruction</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-       {/* Archive Batch Modal */}
-      <Dialog open={showArchiveModal} onOpenChange={setShowArchiveModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Archive Batch {selectedBatch?.id}?</DialogTitle>
-            <DialogDescription>Archived batches will be hidden from active lists but can be retrieved from historical records.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowArchiveModal(false)}>Cancel</Button>
-            <Button onClick={() => handleSubmitModal("archive")}>Archive Batch</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Placeholder Modals for other actions */}
-      <Dialog open={showLogActivityModal} onOpenChange={setShowLogActivityModal}><DialogContent><DialogHeader><DialogTitle>Log Activity for {selectedBatch?.id}</DialogTitle></DialogHeader><Textarea placeholder="Activity details..."/><DialogFooter><Button variant="outline" onClick={()=>setShowLogActivityModal(false)}>Cancel</Button><Button onClick={()=>handleSubmitModal("logActivity")}>Save Log</Button></DialogFooter></DialogContent></Dialog>
-      <Dialog open={showLogNutrientModal} onOpenChange={setShowLogNutrientModal}><DialogContent><DialogHeader><DialogTitle>Log Nutrients/Watering for {selectedBatch?.id}</DialogTitle></DialogHeader><Textarea placeholder="Nutrient/Watering details..."/><DialogFooter><Button variant="outline" onClick={()=>setShowLogNutrientModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Logged"}); setShowLogNutrientModal(false);}}>Save</Button></DialogFooter></DialogContent></Dialog>
-      <Dialog open={showFlagHealthModal} onOpenChange={setShowFlagHealthModal}><DialogContent><DialogHeader><DialogTitle>Flag Health Concern for {selectedBatch?.id}</DialogTitle></DialogHeader><Textarea placeholder="Health concern details..."/><DialogFooter><Button variant="outline" onClick={()=>setShowFlagHealthModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Flagged"}); setShowFlagHealthModal(false);}}>Flag</Button></DialogFooter></DialogContent></Dialog>
-      <Dialog open={showUploadQAModal} onOpenChange={setShowUploadQAModal}><DialogContent><DialogHeader><DialogTitle>Upload Lab QA Results for {selectedBatch?.id}</DialogTitle></DialogHeader><Input type="file"/><DialogFooter><Button variant="outline" onClick={()=>setShowUploadQAModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Uploaded"}); setShowUploadQAModal(false);}}>Upload</Button></DialogFooter></DialogContent></Dialog>
-      <Dialog open={showCloneModal} onOpenChange={setShowCloneModal}><DialogContent><DialogHeader><DialogTitle>Clone Batch {selectedBatch?.id}</DialogTitle></DialogHeader><Input placeholder="New Batch Name/ID Prefix"/><DialogFooter><Button variant="outline" onClick={()=>setShowCloneModal(false)}>Cancel</Button><Button onClick={() => { toast({title: "Cloned"}); setShowCloneModal(false);}}>Clone</Button></DialogFooter></DialogContent></Dialog>
-      
-      {/* Move Plants Modal */}
-      <Dialog open={showMoveModal} onOpenChange={setShowMoveModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Move Plants for Batch {selectedBatch?.id}</DialogTitle>
-            <DialogDescription>Log the movement of plants to a new location. This will create an audit trail entry.</DialogDescription>
-          </DialogHeader>
-          <div className="py-4 space-y-3">
-             <div><Label htmlFor="move-from">From Location</Label><Input id="move-from" disabled defaultValue={selectedBatch?.roomLocation} /></div>
-             <div><Label htmlFor="move-to">To New Location (Room)</Label><Input id="move-to" placeholder="e.g., Flower Room 2B"/></div>
-             <div><Label htmlFor="move-reason">Reason for Move (Optional)</Label><Textarea id="move-reason" placeholder="e.g., Transitioning to flowering stage." rows={2} /></div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowMoveModal(false)}>Cancel</Button>
-            <Button onClick={() => handleSubmitModal("move")}>Confirm Move</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-
     </PageContainer>
   );
 }
@@ -844,3 +720,4 @@ export default function PlantsLifecycleDashboardPage() {
 
 
     
+
