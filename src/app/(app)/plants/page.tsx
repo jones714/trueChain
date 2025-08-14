@@ -70,7 +70,14 @@ import {
   BookOpen, 
   Wrench, 
   ClipboardList,
-  Clock 
+  Clock,
+  Wind,
+  Sun,
+  Ph,
+  Droplet,
+  Gauge,
+  Calendar,
+  Download
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -85,6 +92,8 @@ import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isPast, differenceInDays } from 'date-fns';
 import { useToast } from "@/hooks/use-toast";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 
 type PlantStage = "Germination" | "Vegetative" | "Flowering" | "Harvested" | "Destroyed";
 type QAStatus = "Untested" | "Pass" | "Fail";
@@ -256,6 +265,7 @@ export default function PlantsLifecycleDashboardPage() {
   const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [showDestroyModal, setShowDestroyModal] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<PlantBatch | null>(null);
+  const [showSensorDashboardModal, setShowSensorDashboardModal] = useState(false);
 
 
   const uniqueStrains = useMemo(() => Array.from(new Set(initialPlantBatches.map(b => b.strain))), []);
@@ -562,15 +572,100 @@ export default function PlantsLifecycleDashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-lg flex items-center"><Thermometer className="mr-2 h-5 w-5"/>Environmental Metrics</CardTitle><CardDescription>Real-time sensor data summary for selected batch/room.</CardDescription></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center"><Thermometer className="mr-2 h-5 w-5"/>Environmental Metrics</CardTitle>
+            <CardDescription>Real-time sensor data summary for selected batch/room.</CardDescription>
+          </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between p-2 border rounded-md"><div className="flex items-center"><Thermometer className="h-4 w-4 mr-2 text-red-500"/><span className="text-sm">Avg. Temp</span></div><span className="text-sm font-semibold">75°F</span></div>
             <div className="flex items-center justify-between p-2 border rounded-md"><div className="flex items-center"><Droplets className="h-4 w-4 mr-2 text-blue-500"/><span className="text-sm">Avg. Humidity</span></div><span className="text-sm font-semibold">55%</span></div>
             <div className="flex items-center justify-between p-2 border rounded-md"><div className="flex items-center"><Cloud className="h-4 w-4 mr-2 text-gray-500"/><span className="text-sm">Avg. CO2</span></div><span className="text-sm font-semibold">800 ppm</span></div>
-            <Button variant="link" size="sm" className="p-0 h-auto text-primary">View Sensor Dashboard</Button>
+            <Button variant="default" size="sm" className="w-full" onClick={() => setShowSensorDashboardModal(true)}>View Sensor Dashboard</Button>
           </CardContent>
         </Card>
       </div>
+
+      {/* Sensor Dashboard Modal */}
+      <Dialog open={showSensorDashboardModal} onOpenChange={setShowSensorDashboardModal}>
+        <DialogContent className="max-w-7xl">
+          <DialogHeader>
+            <DialogTitle>Cultivation Sensor Dashboard</DialogTitle>
+            <DialogDescription>Real-time and historical environmental data for your grow zones. Data is simulated for this demo.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4 max-h-[80vh] overflow-y-auto pr-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="zone-selector">Select Zone:</Label>
+                <Select defaultValue="flower-room-1a">
+                  <SelectTrigger id="zone-selector" className="w-[250px]">
+                    <SelectValue placeholder="Select a grow zone..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="veg-room-2b">Veg Room 2B</SelectItem>
+                    <SelectItem value="flower-room-1a">Flower Room 1A</SelectItem>
+                    <SelectItem value="flower-room-2a">Flower Room 2A</SelectItem>
+                    <SelectItem value="drying-room-1">Drying Room 1</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <Select defaultValue="24h">
+                  <SelectTrigger className="w-[150px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="24h">Last 24 Hours</SelectItem>
+                    <SelectItem value="7d">Last 7 Days</SelectItem>
+                    <SelectItem value="custom">Custom Range</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="outline"><Download className="mr-2 h-4 w-4"/>Export Data</Button>
+              </div>
+            </div>
+
+            <Card>
+                <CardHeader><CardTitle className="text-destructive flex items-center"><AlertTriangle className="mr-2"/>Environmental Alerts (2)</CardTitle></CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                    <div className="p-2 border-l-4 border-destructive rounded-r-md bg-destructive/10"><strong>High Humidity Alert:</strong> Flower Room 2A humidity at 72% (Threshold: 60%). Mute | Acknowledge</div>
+                    <div className="p-2 border-l-4 border-yellow-500 rounded-r-md bg-yellow-500/10"><strong>Sensor Offline:</strong> Veg Room 2B - CO2 sensor last synced 2 hours ago. Mute</div>
+                </CardContent>
+            </Card>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+                {/* Live Metrics */}
+                <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Thermometer className="mr-1"/>Temp</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">76°F</p><p className="text-xs text-green-600">Optimal</p></CardContent></Card>
+                <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Wind className="mr-1"/>Humidity</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">58%</p><p className="text-xs text-green-600">Optimal</p></CardContent></Card>
+                <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Cloud className="mr-1"/>CO₂</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">1100 <span className="text-lg">ppm</span></p><p className="text-xs text-green-600">Optimal</p></CardContent></Card>
+                <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium">VPD</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">1.2 <span className="text-lg">kPa</span></p><p className="text-xs text-green-600">Optimal</p></CardContent></Card>
+                <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Sun className="mr-1"/>Light (PPFD)</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">950</p><p className="text-xs text-green-600">Optimal</p></CardContent></Card>
+                <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Droplet className="mr-1"/>Soil Moisture</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">45%</p><p className="text-xs text-green-600">Optimal</p></CardContent></Card>
+                <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Ph className="mr-1"/>Reservoir pH</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">6.1</p><p className="text-xs text-yellow-600">Acceptable</p></CardContent></Card>
+                <Card><CardHeader className="pb-2"><CardTitle className="text-sm font-medium flex items-center"><Gauge className="mr-1"/>Reservoir EC</CardTitle></CardHeader><CardContent><p className="text-2xl font-bold">1.8</p><p className="text-xs text-green-600">Optimal</p></CardContent></Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <Card>
+                    <CardHeader><CardTitle className="text-base">Temperature & Humidity (24h)</CardTitle></CardHeader>
+                    <CardContent className="h-64 flex items-center justify-center text-muted-foreground">[Time-Series Chart Placeholder]</CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader><CardTitle className="text-base">CO₂ Levels (24h)</CardTitle></CardHeader>
+                    <CardContent className="h-64 flex items-center justify-center text-muted-foreground">[Time-Series Chart Placeholder]</CardContent>
+                </Card>
+            </div>
+            
+             <Card>
+                <CardHeader>
+                    <CardTitle>Sensor Map Overlay</CardTitle>
+                    <CardDescription>Placeholder for a visual heatmap of the selected grow room, showing sensor readings spatially.</CardDescription>
+                </CardHeader>
+                <CardContent className="min-h-48 flex items-center justify-center bg-muted/50 rounded-md text-muted-foreground">
+                    [Future Sensor Map/Heatmap Visualization]
+                </CardContent>
+             </Card>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Create Plant Batch Modal */}
       <Dialog open={showCreateBatchModal} onOpenChange={setShowCreateBatchModal}>
@@ -745,3 +840,4 @@ export default function PlantsLifecycleDashboardPage() {
   );
 }
     
+
