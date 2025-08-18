@@ -4,7 +4,7 @@ import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Building, BadgeCheck, Settings, Activity, ShieldCheck, Workflow, MapPin, History, Fingerprint, Megaphone } from "lucide-react";
+import { Users, Building, BadgeCheck, Settings, Activity, ShieldCheck, Workflow, MapPin, History, Fingerprint, Megaphone, Zap } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboardPage() {
@@ -109,6 +109,17 @@ export default function AdminDashboardPage() {
               <Button variant="link" className="p-0 h-auto text-primary text-xs mt-2">Configure</Button>
             </CardContent>
         </Card>
+        <Link href="/admin/environmental" passHref>
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-base font-semibold">Environmental</CardTitle>
+              <Zap className="h-5 w-5 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">Monitor and manage utility usage and environmental data.</p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
     </PageContainer>
   );

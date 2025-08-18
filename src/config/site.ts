@@ -35,6 +35,7 @@ import {
   Map,
   Fingerprint,
   Megaphone,
+  Zap,
 } from "lucide-react";
 
 export type SiteConfig = {
@@ -161,6 +162,11 @@ export const siteConfig: SiteConfig = {
       title: "Recalls",
       href: "/admin/recalls",
       icon: Megaphone,
+    },
+    {
+      title: "Environmental",
+      href: "/admin/environmental",
+      icon: Zap,
     },
     {
       title: "System Settings",
