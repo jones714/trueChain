@@ -10,8 +10,8 @@ import { Separator } from "@/components/ui/separator";
 export default function InventoryPage() {
   return (
     <PageContainer>
-      <PageHeader 
-        title="Comprehensive Inventory Management" 
+      <PageHeader
+        title="Comprehensive Inventory Management"
         description="Track cannabis products (bulk, packaged, sold), operational hardware, and ensure full traceability across multiple facilities and licenses. Includes tracking for non-METRC/sample batches.">
         <div className="flex flex-wrap gap-2">
           <Button>
@@ -67,7 +67,7 @@ export default function InventoryPage() {
           </CardContent>
         </Card>
       </div>
-      
+
       <Card>
         <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">

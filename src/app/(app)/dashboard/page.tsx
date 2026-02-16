@@ -125,7 +125,7 @@ export default function DashboardPageV2() {
             <p className="text-xs text-muted-foreground">Total value by category (e.g. Flower, Edibles)</p>
           </CardContent>
         </Card>
-         <Card>
+         <Card className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => window.location.href = '/admin/metrc-sync'}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
              <TooltipProvider>
               <Tooltip>
@@ -133,7 +133,7 @@ export default function DashboardPageV2() {
                     <CardTitle className="text-sm font-medium">Compliance Status (METRC)</CardTitle>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p className="text-xs">Real-time METRC sync status and error reporting.</p>
+                    <p className="text-xs">Real-time METRC sync status and error reporting. Click to manage sync.</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -141,10 +141,10 @@ export default function DashboardPageV2() {
           </CardHeader>
           <CardContent>
              <div className="text-2xl font-bold flex items-center">
-                {kpiSummary.metrcStatus} 
+                {kpiSummary.metrcStatus}
                 <CheckCircle2 className="h-5 w-5 text-green-500 ml-2"/>
             </div>
-            <p className="text-xs text-muted-foreground">Last sync: 2 min ago</p>
+            <p className="text-xs text-muted-foreground">Last sync: 2 min ago • Click to manage</p>
           </CardContent>
         </Card>
         <Card>

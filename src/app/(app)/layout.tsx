@@ -53,7 +53,7 @@ function SidebarPlaceholderContent() {
       <SidebarFooter className="p-4 mt-auto">
         {!isCollapsed && (
           <p className="text-xs text-sidebar-foreground/70">
-            © {new Date().getFullYear()} TruCanalytix
+            © {new Date().getFullYear()} TruChain
           </p>
         )}
       </SidebarFooter>
@@ -92,7 +92,7 @@ function SidebarInnerContent() {
         {/* Footer content like version number or quick links */}
         {!isCollapsed && (
           <p className="text-xs text-sidebar-foreground/70">
-            © {new Date().getFullYear()} TruCanalytix
+            © {new Date().getFullYear()} TruChain
           </p>
         )}
       </SidebarFooter>
@@ -108,7 +108,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
 
   React.useEffect(() => {
-    const storedState = localStorage.getItem("sidebar_state_trucanalytix");
+    const storedState = localStorage.getItem("sidebar_state_truchain");
     if (storedState !== null) {
       setPersistedSidebarOpen(JSON.parse(storedState));
     }
@@ -117,7 +117,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const handleOpenChange = (open: boolean) => {
     setPersistedSidebarOpen(open);
-    localStorage.setItem("sidebar_state_trucanalytix", JSON.stringify(open));
+    localStorage.setItem("sidebar_state_truchain", JSON.stringify(open));
   };
   
   return (
