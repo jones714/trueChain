@@ -44,7 +44,7 @@ export type SiteConfig = {
 };
 
 export const siteConfig: SiteConfig = {
-  name: "TruCanalytix",
+  name: "TruChain",
   description: "Comprehensive Cannabis Compliance and Management Platform.",
   url: "https://example.com", 
   ogImage: "https://example.com/og.jpg", 

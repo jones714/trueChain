@@ -1,0 +1,78 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      // Users can update their own profile
+      allow update: if isAuthenticated() && request.auth.uid == userId;
+      // Only system can create (via Cloud Functions or during signup)
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      // Admins can read all users
+      allow read: if isAdmin();
+    }
+
+    // Facilities collection
+    match /facilities/{facilityId} {
+      // Users can read facilities they have access to
+      allow read: if isAuthenticated();
+      // Only admins can create/update/delete facilities
+      allow create, update, delete: if isAdmin();
+
+      // Sync status subcollection (read-only for users, write-only for Cloud Functions)
+      match /syncStatus/{statusId} {
+        allow read: if isAuthenticated();
+        allow write: if false; // Only Cloud Functions can write
+      }
+
+      // Packages subcollection
+      match /packages/{packageId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated();
+      }
+
+      // Plants subcollection
+      match /plants/{plantId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated();
+      }
+
+      // Transfers subcollection
+      match /transfers/{transferId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated();
+      }
+
+      // Sales Receipts subcollection
+      match /salesReceipts/{receiptId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated();
+      }
+
+      // Metrc Logs subcollection
+      match /metrcLogs/{logId} {
+        allow read: if isAuthenticated();
+        allow write: if false; // Only Cloud Functions can write
+      }
+    }
+
+    // Sync Logs collection (read-only for admins)
+    match /syncLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false; // Only Cloud Functions can write
+    }
+  }
+}

@@ -12,7 +12,7 @@ import { Save, UserCircle, Bell, Palette, Lock } from "lucide-react";
 export default function UserSettingsPage() {
   return (
     <PageContainer>
-      <PageHeader title="Settings" description="Personalize your TruCanalytix experience." />
+      <PageHeader title="Settings" description="Personalize your TruChain experience." />
 
       <Tabs defaultValue="account" className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6">

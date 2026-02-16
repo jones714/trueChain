@@ -14,7 +14,7 @@ export default function ProfilePage() {
   // Dummy user data
   const user = {
     name: "Admin User",
-    email: "admin@trucanalytix.com",
+    email: "admin@truchain.com",
     role: "Administrator",
     avatar: "https://placehold.co/128x128.png",
     dataAiHint: "person professional",

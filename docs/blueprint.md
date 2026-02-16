@@ -1,4 +1,4 @@
-# **App Name**: TruCanalytix
+# **App Name**: TruChain
 
 ## Core Features:
 
